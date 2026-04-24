@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sokogate Construction Materials Calculator</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    #3d-container {
+      width: 100%;
+      height: 350px;
+      border-radius: 12px;
+      margin-top: 24px;
+      overflow: hidden;
+      cursor: grab;
+      border: 2px solid #333;
+      background: #e0e0e0;
+    }
+    #3d-container:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Construction Materials Calculator</h1>
+    <p class="subtitle">Calculate cement, sand, bricks, and more for your construction project</p>
+    
+    <form action="/calculate" method="POST" id="calcForm">
+      <div class="form-group">
+        <label for="area">Area (sq ft):</label>
+        <input type="number" id="area" name="area" required min="1" step="0.01" placeholder="Enter area in square feet">
+      </div>
+      
+      <div class="form-group">
+        <label for="materialType">Material Type:</label>
+        <select id="materialType" name="materialType" required>
+          <option value="">Select material</option>
+          <option value="cement">Cement & Sand (Plastering)</option>
+          <option value="bricks">Bricks (Wall)</option>
+          <option value="concrete">Concrete (Slab)</option>
+          <option value="painting">Paint (Interior)</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="thicknessGroup" style="display: none;">
+        <label for="thickness">Thickness (inches):</label>
+        <input type="number" id="thickness" name="thickness" min="1" max="12" step="0.5" value="4" placeholder="Thickness in inches">
+      </div>
+      
+      <button type="submit" class="btn">Calculate</button>
+    </form>
+    
+    <% if (result) { %>
+      <div class="results">
+        <h2>Results:</h2>
+        <% if (result.error) { %>
+          <p class="error"><%= result.error %></p>
+        <% } else { %>
+          <% if (result.cement) { %>
+            <div class="result-item">
+              <span class="label">Cement:</span>
+              <span class="value"><%= result.cement %></span>
+            </div>
+          <% } %>
+          <% if (result.sand) { %>
+            <div class="result-item">
+              <span class="label">Sand:</span>
+              <span class="value"><%= result.sand %></span>
+            </div>
+          <% } %>
+          <% if (result.bricks) { %>
+            <div class="result-item">
+              <span class="label">Bricks:</span>
+              <span class="value"><%= result.bricks %></span>
+            </div>
+          <% } %>
+          <% if (result.concrete) { %>
+            <div class="result-item">
+              <span class="label">Concrete:</span>
+              <span class="value"><%= result.concrete %></span>
+            </div>
+          <% } %>
+          <% if (result.aggregate) { %>
+            <div class="result-item">
+              <span class="label">Aggregate:</span>
+              <span class="value"><%= result.aggregate %></span>
+            </div>
+          <% } %>
+          <% if (result.paint) { %>
+            <div class="result-item">
+              <span class="label">Paint:</span>
+              <span class="value"><%= result.paint %></span>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+      <div id="3d-container"></div>
+    <% } else { %>
+      <div id="3d-container"></div>
+    <% } %>
+  </div>
+
+  <script src="/three.min.js"></script>
+  <script src="/3d-room.js"></script>
+  <script>
+    const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
+    console.log('resultData:', resultData);
+  </script>
+  <script src="/script.js"></script>
+</body>
+</html>
