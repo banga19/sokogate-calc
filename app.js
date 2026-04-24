@@ -10,15 +10,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
+app.get('/sokogate-calc', (req, res) => {
   res.render('index', { result: null });
 });
 
-app.get('/calculate', (req, res) => {
+app.get('/sokogate-calc/calculate', (req, res) => {
   res.render('index', { result: null });
 });
 
-app.post('/calculate', (req, res) => {
+app.post('/sokogate-calc/calculate', (req, res) => {
   const { area, materialType, thickness } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
