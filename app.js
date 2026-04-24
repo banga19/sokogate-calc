@@ -427,6 +427,5 @@ app.post('/sokogate-calc/calculate', (req, res) => {
   res.render('index', { result });
 });
 
-app.listen(port, () => {
-  console.log(`Sokogate Calculator running on port ${port}`);
-});
+// Export the Express app for cPanel's Node.js handler
+module.exports = app;
