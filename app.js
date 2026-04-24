@@ -19,12 +19,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Serve the calculator page
 app.get('/sokogate-calc', (req, res) => {
   console.log('Serving calculator page (GET /sokogate-calc)');
-  res.render('index', { result: null });
+  res.render('index', { result: null, query: req.query });
 });
 
 app.get('/sokogate-calc/calculate', (req, res) => {
   console.log('Serving calculator page (GET /sokogate-calc/calculate)');
-  res.render('index', { result: null });
+  res.render('index', { result: null, query: req.query });
 });
 
 // Redirect /calculate to calculator page (handle WordPress redirect target)
@@ -151,7 +151,7 @@ app.post('/sokogate-calc/calculate', (req, res) => {
     }
 
     console.log('Calculation result:', result);
-    res.render('index', { result });
+    res.render('index', { result, query: req.query });
   } catch (err) {
     console.error('Calculation error:', err);
     result = { error: 'An error occurred during calculation. Please try again.' };
@@ -168,7 +168,8 @@ app.get('/health', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).render('index', { 
-    result: { error: 'Internal server error. Please try again.' } 
+    result: { error: 'Internal server error. Please try again.' },
+    query: req.query
   });
 });
 
