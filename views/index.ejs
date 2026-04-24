@@ -86,7 +86,7 @@
         <button type="submit" class="btn">Calculate Materials</button>
       </form>
 
-      <% if (result) { %>
+      <% if (typeof result !== 'undefined' && result) { %>
         <section class="results">
           <h2>Results</h2>
           <% if (result.error) { %>
@@ -223,6 +223,13 @@
         <div id="3d-container"></div>
       <% } %>
     </main>
+
+    <!-- Debug: Show result object if ?debug=1 -->
+    <% if (typeof result !== 'undefined' && result && typeof query !== 'undefined' && query.debug) { %>
+      <div style="background:#f00;color:#fff;padding:10px;margin-top:20px;font-family:monospace;font-size:12px;">
+        <strong>DEBUG:</strong> <pre><%= JSON.stringify(result, null, 2) %></pre>
+      </div>
+    <% } %>
   </div>
 
   <script src="/three.min.js"></script>
