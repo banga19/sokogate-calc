@@ -14,7 +14,7 @@
     </header>
 
     <main>
-      <form action="/calculate" method="POST" id="calcForm">
+      <form action="/sokogate-calc/calculate" method="POST" id="calcForm">
         <div class="form-group">
           <label for="area">Area (sq ft)</label>
           <input 
@@ -33,13 +33,29 @@
           <label for="materialType">Material Type</label>
           <select id="materialType" name="materialType" required>
             <option value="">Select material</option>
-            <option value="cement">Cement & Sand (Plastering)</option>
-            <option value="bricks">Bricks (Wall)</option>
-            <option value="concrete">Concrete (Slab)</option>
-            <option value="painting">Paint (Interior)</option>
+            <optgroup label="Masonry">
+              <option value="cement">Cement & Sand (Plastering)</option>
+              <option value="bricks">Bricks (Wall - 9x4.5 inch)</option>
+              <option value="blocks">Concrete Blocks (8x8x16 inch)</option>
+            </optgroup>
+            <optgroup label="Concrete & Reinforcement">
+              <option value="concrete">Concrete Slab</option>
+              <option value="steel">Reinforcement Steel</option>
+            </optgroup>
+            <optgroup label="Finishes">
+              <option value="tiles">Floor/Wall Tiles</option>
+              <option value="painting">Paint (Interior)</option>
+            </optgroup>
+            <optgroup label="Landscaping">
+              <option value="gravel">Crushed Stone / Gravel</option>
+            </optgroup>
+            <optgroup label="Roofing">
+              <option value="roofing">Metal Roofing Sheets</option>
+            </optgroup>
           </select>
         </div>
 
+        <!-- Thickness Field (shown for concrete & steel) -->
         <div class="form-group" id="thicknessGroup" style="display: none;">
           <label for="thickness">Thickness (inches)</label>
           <input 
@@ -50,8 +66,21 @@
             max="12" 
             step="0.5" 
             value="4" 
-            placeholder="Thickness in inches"
+            placeholder="Slab thickness (4 = 4 inch)"
           >
+          <small class="field-hint">Standard concrete slab: 4-6 inches</small>
+        </div>
+
+        <!-- Tile Size Field (shown for tiles) -->
+        <div class="form-group" id="tileSizeGroup" style="display: none;">
+          <label for="tileSize">Tile Size (inches)</label>
+          <select id="tileSize" name="tileSize">
+            <option value="12">12 x 12 inch</option>
+            <option value="18">18 x 18 inch</option>
+            <option value="24">24 x 24 inch</option>
+            <option value="6">6 x 6 inch (mosaic)</option>
+          </select>
+          <small class="field-hint">10% wastage included automatically</small>
         </div>
 
         <button type="submit" class="btn">Calculate Materials</button>
@@ -61,11 +90,57 @@
         <section class="results">
           <h2>Results</h2>
           <% if (result.error) { %>
-            <p class="error"><%= result.error %></p>
+            <div class="error">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="10" cy="10" r="8"/>
+                <line x1="10" y1="6" x2="10" y2="14"/>
+                <line x1="10" y1="14" x2="14" y2="10"/>
+              </svg>
+              <span><%= result.error %></span>
+            </div>
           <% } else { %>
+            <div class="result-summary">
+              <span class="material-type-badge"><%= result.materialType || 'Material Calculation' %></span>
+            </div>
+            <% if (result.tiles) { %>
+              <div class="result-item">
+                <span class="label">Tiles Required</span>
+                <span class="value highlight"><%= result.tiles %></span>
+              </div>
+            <% } %>
+            <% if (result.tileArea) { %>
+              <div class="result-item">
+                <span class="label">Total Tile Area</span>
+                <span class="value"><%= result.tileArea %></span>
+              </div>
+            <% } %>
+            <% if (result.adhesive) { %>
+              <div class="result-item">
+                <span class="label">Tile Adhesive</span>
+                <span class="value"><%= result.adhesive %></span>
+              </div>
+            <% } %>
+            <% if (result.grout) { %>
+              <div class="result-item">
+                <span class="label">Tile Grout</span>
+                <span class="value"><%= result.grout %></span>
+              </div>
+            <% } %>
+            <% if (result.bricks) { %>
+              <div class="result-item">
+                <span class="label">Bricks</span>
+                <span class="value highlight"><%= result.bricks %></span>
+              </div>
+            <% } %>
+            <% if (result.blocks) { %>
+              <div class="result-item">
+                <span class="label">Concrete Blocks</span>
+                <span class="value highlight"><%= result.blocks %></span>
+              </div>
+            <% } %>
             <% if (result.cement) { %>
               <div class="result-item">
-                <span class="label">Cement</span>
+                <span class="label">Cement (50kg bags)</span>
                 <span class="value"><%= result.cement %></span>
               </div>
             <% } %>
@@ -75,16 +150,10 @@
                 <span class="value"><%= result.sand %></span>
               </div>
             <% } %>
-            <% if (result.bricks) { %>
-              <div class="result-item">
-                <span class="label">Bricks</span>
-                <span class="value"><%= result.bricks %></span>
-              </div>
-            <% } %>
             <% if (result.concrete) { %>
               <div class="result-item">
-                <span class="label">Concrete</span>
-                <span class="value"><%= result.concrete %></span>
+                <span class="label">Concrete Volume</span>
+                <span class="value highlight"><%= result.concrete %></span>
               </div>
             <% } %>
             <% if (result.aggregate) { %>
@@ -93,10 +162,58 @@
                 <span class="value"><%= result.aggregate %></span>
               </div>
             <% } %>
+            <% if (result.steel) { %>
+              <div class="result-item">
+                <span class="label">Steel (Rebar)</span>
+                <span class="value highlight"><%= result.steel %></span>
+              </div>
+            <% } %>
+            <% if (result.wireMesh) { %>
+              <div class="result-item">
+                <span class="label">Wire Mesh</span>
+                <span class="value"><%= result.wireMesh %></span>
+              </div>
+            <% } %>
             <% if (result.paint) { %>
               <div class="result-item">
                 <span class="label">Paint</span>
-                <span class="value"><%= result.paint %></span>
+                <span class="value highlight"><%= result.paint %></span>
+              </div>
+            <% } %>
+            <% if (result.primer) { %>
+              <div class="result-item">
+                <span class="label">Primer</span>
+                <span class="value"><%= result.primer %></span>
+              </div>
+            <% } %>
+            <% if (result.gravel) { %>
+              <div class="result-item">
+                <span class="label">Crushed Stone</span>
+                <span class="value highlight"><%= result.gravel %></span>
+              </div>
+            <% } %>
+            <% if (result.geotextile) { %>
+              <div class="result-item">
+                <span class="label">Geotextile Fabric</span>
+                <span class="value"><%= result.geotextile %> sq ft</span>
+              </div>
+            <% } %>
+            <% if (result.roofingSheets) { %>
+              <div class="result-item">
+                <span class="label">Roofing Sheets</span>
+                <span class="value highlight"><%= result.roofingSheets %></span>
+              </div>
+            <% } %>
+            <% if (result.screws) { %>
+              <div class="result-item">
+                <span class="label">Roofing Screws</span>
+                <span class="value"><%= result.screws %></span>
+              </div>
+            <% } %>
+            <% if (result.flashing) { %>
+              <div class="result-item">
+                <span class="label">Flashing</span>
+                <span class="value"><%= result.flashing %> ft</span>
               </div>
             <% } %>
           <% } %>
