@@ -13,4 +13,4 @@
 - [x] Sync `sokogate-calc-deploy/public/script.js`
 - [x] Sync `sokogate-calc-deploy/views/index.ejs`
 - [x] Sync `sokogate-calc-deploy/public/style.css`
-- [ ] Test locally and verify
+- [x] Test locally and verify
