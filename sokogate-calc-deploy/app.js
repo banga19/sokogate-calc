@@ -1,0 +1,156 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve calculator page at root
+app.get('/', (req, res) => {
+  res.render('index', { result: null, query: req.query });
+});
+
+// Serve calculator page
+app.get('/sokogate-calc', (req, res) => {
+  res.render('index', { result: null, query: req.query });
+});
+
+app.get('/sokogate-calc/calculate', (req, res) => {
+  res.render('index', { result: null, query: req.query });
+});
+
+// Redirect /calculate to calculator page
+app.get('/calculate', (req, res) => {
+  res.redirect('/sokogate-calc');
+});
+
+// Handle form submission
+app.post('/sokogate-calc/calculate', (req, res) => {
+  const { area, materialType, thickness, tileSize } = req.body;
+  let result = {};
+  const areaNum = parseFloat(area);
+
+  if (isNaN(areaNum) || areaNum <= 0) {
+    result = { error: 'Please enter a valid area (greater than 0)' };
+    return res.render('index', { result });
+  }
+
+  const thicknessNum = parseFloat(thickness) || 4;
+  const tileSizeNum = parseFloat(tileSize) || 12;
+
+  try {
+    switch (materialType) {
+      case 'cement':
+        result.cement = (areaNum * 0.4).toFixed(2) + ' bags (50kg)';
+        result.sand = (areaNum * 0.5).toFixed(2) + ' cubic ft';
+        result.materialType = 'Cement & Sand (Plastering)';
+        break;
+      case 'bricks':
+        result.bricks = (areaNum * 6.25).toFixed(0) + ' bricks';
+        result.cement = Math.ceil(areaNum * 0.02) + ' bags';
+        result.sand = (areaNum * 0.15).toFixed(2) + ' cubic ft';
+        result.materialType = 'Bricks (9x4.5 inch)';
+        break;
+      case 'concrete':
+        const thicknessInFeet = thicknessNum / 12;
+        const concreteVolume = areaNum * thicknessInFeet;
+        result.concrete = concreteVolume.toFixed(2) + ' cubic ft (' + (concreteVolume * 0.037).toFixed(2) + ' m³)';
+        result.cement = Math.ceil(concreteVolume * 6) + ' bags (50kg)';
+        result.sand = (concreteVolume * 0.5).toFixed(2) + ' cubic ft';
+        result.aggregate = (concreteVolume * 1).toFixed(2) + ' cubic ft';
+        result.materialType = 'Concrete Slab (1:2:4 Mix)';
+        break;
+      case 'painting':
+        result.paint = (areaNum * 0.015).toFixed(2) + ' liters (2 coats)';
+        result.primer = (areaNum * 0.01).toFixed(2) + ' liters';
+        result.materialType = 'Paint (Interior)';
+        break;
+      case 'tiles':
+        if (!tileSizeNum || tileSizeNum <= 0) {
+          result = { error: 'Please select a tile size' };
+          return res.render('index', { result });
+        }
+        const tileSizeInSqFt = (tileSizeNum * tileSizeNum) / 144;
+        const tilesNeeded = Math.ceil(areaNum / tileSizeInSqFt * 1.1);
+        const tileArea = (tilesNeeded * tileSizeNum * tileSizeNum) / 144;
+        result.tiles = tilesNeeded.toFixed(0) + ' tiles (' + tileSizeNum + '")';
+        result.tileArea = tileArea.toFixed(2) + ' sq ft (with wastage)';
+        result.adhesive = (tilesNeeded * 0.02).toFixed(2) + ' liters';
+        result.grout = (tilesNeeded * 0.1).toFixed(2) + ' kg';
+        result.materialType = 'Floor/Wall Tiles';
+        break;
+      case 'steel':
+        if (thicknessNum <= 0) {
+          result = { error: 'Thickness is required for steel calculation' };
+          return res.render('index', { result });
+        }
+        const steelKgPerSqFt = 0.5 * (thicknessNum / 4);
+        result.steel = (areaNum * steelKgPerSqFt).toFixed(2) + ' kg';
+        result.wireMesh = (areaNum * 1.2).toFixed(2) + ' sq ft';
+        result.materialType = 'Reinforcement Steel';
+        break;
+      case 'blocks':
+        const blockArea = 0.89;
+        const blocksNeeded = Math.ceil(areaNum / blockArea * 1.05);
+        result.blocks = blocksNeeded.toFixed(0) + ' concrete blocks (8x8x16")';
+        result.cement = Math.ceil(blocksNeeded * 0.015) + ' bags';
+        result.sand = (blocksNeeded * 0.07).toFixed(2) + ' cubic ft';
+        result.materialType = 'Concrete Blocks';
+        break;
+      case 'gravel':
+        const gravelThicknessFt = thicknessNum / 12;
+        const gravelVolume = areaNum * gravelThicknessFt;
+        result.gravel = gravelVolume.toFixed(2) + ' cubic ft (' + (gravelVolume * 0.037).toFixed(2) + ' m³)';
+        result.geotextile = Math.ceil(areaNum) + ' sq ft';
+        result.materialType = 'Crushed Stone/Gravel';
+        break;
+      case 'roofing':
+        const sheetsNeeded = Math.ceil(areaNum / 30 * 1.1);
+        result.roofingSheets = sheetsNeeded.toFixed(0) + ' metal sheets';
+        result.screws = (sheetsNeeded * 8).toFixed(0) + ' roofing screws';
+        result.flashing = Math.ceil(areaNum / 50).toFixed(0) + ' linear ft';
+        result.materialType = 'Metal Roofing';
+        break;
+      default:
+        result = { error: 'Invalid material type selected' };
+    }
+    res.render('index', { result, query: req.query });
+  } catch (err) {
+    console.error('Calculation error:', err);
+    res.render('index', { result: { error: 'An error occurred.' } });
+  }
+});
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).render('index', {
+    result: { error: 'Internal server error.' },
+    query: req.query
+  });
+});
+
+// Start server only when run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Sokogate Calculator running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

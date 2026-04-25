@@ -1,0 +1,35 @@
+# Sokogate-Calc cPanel URL Rewriting
+# This file ensures clean URLs and proper routing for the Node.js app
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # If the requested filename exists, serve it directly
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Otherwise, forward the request to the Node.js app
+    RewriteRule ^(.*)$ /sokogate-calc/$1 [QSA,L]
+</IfModule>
+
+# Enable CORS for static assets (optional)
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+</IfModule>
+
+# Prevent access to sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deny access to backup files
+<FilesMatch "\.(backup|bak|tar\.gz|zip)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Set default charset
+AddDefaultCharset UTF-8
