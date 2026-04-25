@@ -64,6 +64,23 @@ function initRoom3D(containerId) {
   roomGroup = new THREE.Group();
   roomScene.add(roomGroup);
 
+  // Dimension labels overlay
+  const dimensionLabels = document.createElement('div');
+  dimensionLabels.id = 'dimension-labels';
+  dimensionLabels.style.position = 'absolute';
+  dimensionLabels.style.top = '10px';
+  dimensionLabels.style.left = '10px';
+  dimensionLabels.style.color = '#333';
+  dimensionLabels.style.fontSize = '14px';
+  dimensionLabels.style.fontFamily = 'Arial, sans-serif';
+  dimensionLabels.style.background = 'rgba(255, 255, 255, 0.9)';
+  dimensionLabels.style.padding = '8px 12px';
+  dimensionLabels.style.borderRadius = '6px';
+  dimensionLabels.style.pointerEvents = 'none';
+  dimensionLabels.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+  dimensionLabels.innerHTML = 'Height: -- ft<br>Width: -- ft<br>Length: -- ft';
+  roomContainer.appendChild(dimensionLabels);
+
   // Initialize orbit controls
   initRoomOrbitControls();
 
@@ -331,6 +348,12 @@ function updateRoom3D(dimensions, unit) {
   roomCamera.position.x = r * Math.sin(phi) * Math.cos(theta);
   roomCamera.position.y = r * Math.cos(phi);
   roomCamera.position.z = r * Math.sin(phi) * Math.sin(theta);
+
+  // Update dimension labels
+  const dimensionLabels = document.getElementById('dimension-labels');
+  if (dimensionLabels) {
+    dimensionLabels.innerHTML = `Height: ${dimensions.height.toFixed(1)} ${unit}<br>Width: ${dimensions.width.toFixed(1)} ${unit}<br>Length: ${dimensions.length.toFixed(1)} ${unit}`;
+  }
 }
 
 // ============================================================

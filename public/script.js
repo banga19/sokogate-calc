@@ -103,13 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (roomForm) {
     roomForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const formData = new FormData(roomForm);
-      const data = {
-        height: formData.get('height'),
-        width: formData.get('width'),
-        length: formData.get('length'),
-        unit: formData.get('unit') || 'ft'
-      };
+    const formData = new FormData(roomForm);
+    const data = {
+      height: formData.get('height'),
+      width: formData.get('width'),
+      length: formData.get('length'),
+      unit: formData.get('unit')
+    };
 
       if (roomBtn) {
         roomBtn.disabled = true;
@@ -125,11 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const result = await response.json();
 
-        if (response.ok) {
-          displayRoomResults(result);
-          if (typeof updateRoom3D === 'function') {
-            updateRoom3D(result.dimensions, result.unit);
-          }
+      if (response.ok) {
+        displayRoomResults(result);
+        if (typeof updateRoom3D === 'function') {
+          updateRoom3D(result.dimensions, result.unit);
+        }
+      }
         } else {
           showRoomError(result.error || 'Invalid input. Please check your dimensions.');
         }

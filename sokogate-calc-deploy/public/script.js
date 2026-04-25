@@ -103,13 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (roomForm) {
     roomForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const formData = new FormData(roomForm);
-      const data = {
-        height: formData.get('height'),
-        width: formData.get('width'),
-        length: formData.get('length'),
-        unit: formData.get('unit') || 'ft'
-      };
+    const formData = new FormData(roomForm);
+    const data = {
+      height: formData.get('height'),
+      width: formData.get('width'),
+      length: formData.get('length'),
+      unit: formData.get('unit')
+    };
 
       if (roomBtn) {
         roomBtn.disabled = true;
@@ -125,28 +125,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const result = await response.json();
 
-        if (response.ok) {
-          displayRoomResults(result);
-          if (typeof updateRoom3D === 'function') {
-            updateRoom3D(result.dimensions, result.unit);
-          }
+      if (response.ok) {
+        displayRoomResults(result);
+        if (typeof updateRoom3D === 'function') {
+          updateRoom3D(result.dimensions, result.unit);
+        }
+      }
         } else {
           showRoomError(result.error || 'Invalid input. Please check your dimensions.');
         }
       } catch (error) {
         console.error('Room calculation error:', error);
         showRoomError('Failed to calculate. Please try again.');
-      } finally {
-        if (roomBtn) {
-          roomBtn.disabled = false;
-          roomBtn.textContent = 'Calculate Materials';
-        }
+    } finally {
+      roomBtn.disabled = false;
+      roomBtn.textContent = 'Visualize Room';
+    }
       }
     });
   }
 
-  function displayRoomResults(result) {
-    if (!roomResults) return;
+function displayRoomResults(result) {
     roomResults.innerHTML = `
       <section class="results">
         <h3>Room Materials</h3>
@@ -172,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </section>
     `;
+    document.getElementById('3d-room-container').style.display = 'block';
   }
 
-  function showRoomError(message) {
-    if (!roomResults) return;
+function showRoomError(message) {
     roomResults.innerHTML = `
       <div class="error">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span>${message}</span>
       </div>
     `;
+    document.getElementById('3d-room-container').style.display = 'none';
   }
 
   // Initialize room 3D scene
@@ -310,6 +310,45 @@ styleSheet.textContent = `
     font-weight: 400;
     color: #1f2937;
     padding-left: 12px;
+  }
+
+  .room-visualizer {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .room-visualizer h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #374151;
+  }
+
+  .room-visualizer form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+  }
+
+  .room-visualizer .form-group {
+    margin-bottom: 15px;
+  }
+
+  .room-visualizer .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  #room-results {
+    margin-bottom: 20px;
+  }
+
+  .room-hint {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 10px;
   }
 `;
 document.head.appendChild(styleSheet);
