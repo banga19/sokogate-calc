@@ -159,8 +159,32 @@ app.use((err, req, res, next) => {
 
 // Start server only when run directly
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Sokogate Calculator running on port ${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ Error: Port ${PORT} is already in use!\n`);
+      console.error('Solutions:');
+      console.error('   1. Use a different port: PORT=3001 npm start');
+      console.error('   2. Kill the process using port 3000:');
+      console.error('      lsof -ti:3000 | xargs kill -9');
+      console.error('   3. For cPanel: Restart the app in "Setup Node.js App" panel');
+      console.error('\n');
+      process.exit(1);
+    } else {
+      console.error('Server error:', err.message);
+      process.exit(1);
+    }
+  });
+
+  // Graceful shutdown on SIGTERM
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      process.exit(0);
+    });
   });
 }
 
