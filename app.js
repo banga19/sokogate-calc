@@ -171,6 +171,3 @@ app.use((err, req, res, next) => {
     query: req.query
   });
 });
-
-// Export the Express app for cPanel's Node.js handler (LSNode)
-module.exports = app;
