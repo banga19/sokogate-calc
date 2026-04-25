@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/sokogate-calc', express.static(path.join(__dirname, 'public')));
 
 // Serve calculator page at root
 app.get('/', (req, res) => {
