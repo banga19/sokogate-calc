@@ -14,6 +14,7 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve calculator page at root
@@ -37,7 +38,7 @@ app.get('/calculate', (req, res) => {
 
 // Handle form submission
 app.post('/sokogate-calc/calculate', (req, res) => {
-  const { area, materialType, thickness, tileSize } = req.body;
+  const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
 
@@ -48,6 +49,11 @@ app.post('/sokogate-calc/calculate', (req, res) => {
 
   const thicknessNum = parseFloat(thickness) || 4;
   const tileSizeNum = parseFloat(tileSize) || 12;
+
+  // Parse room dimensions
+  const roomWidthNum = parseFloat(roomWidth) || 0;
+  const roomHeightNum = parseFloat(roomHeight) || 0;
+  const roomLengthNum = parseFloat(roomLength) || 0;
 
   try {
     switch (materialType) {
@@ -125,11 +131,77 @@ app.post('/sokogate-calc/calculate', (req, res) => {
       default:
         result = { error: 'Invalid material type selected' };
     }
+
+    // Attach room dimensions to result
+    result.roomWidth = roomWidthNum;
+    result.roomHeight = roomHeightNum;
+    result.roomLength = roomLengthNum;
+
     res.render('index', { result, query: req.query });
   } catch (err) {
     console.error('Calculation error:', err);
     res.render('index', { result: { error: 'An error occurred.' } });
   }
+});
+
+// API endpoint for room visualizer
+app.post('/api/calculate-room', (req, res) => {
+  const { height, width, length, unit } = req.body;
+
+  const heightNum = parseFloat(height);
+  const widthNum = parseFloat(width);
+  const lengthNum = parseFloat(length);
+  const unitType = unit === 'm' ? 'm' : 'ft';
+
+  const errors = [];
+  if (isNaN(heightNum) || heightNum <= 0) {
+    errors.push('Height must be a positive number greater than 0.');
+  }
+  if (isNaN(widthNum) || widthNum <= 0) {
+    errors.push('Width must be a positive number greater than 0.');
+  }
+  if (isNaN(lengthNum) || lengthNum <= 0) {
+    errors.push('Length must be a positive number greater than 0.');
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ error: errors.join(' ') });
+  }
+
+  // Convert to meters for consistent 3D scaling (1 unit = 1 meter)
+  const conversionFactor = unitType === 'ft' ? 0.3048 : 1;
+  const heightM = heightNum * conversionFactor;
+  const widthM = widthNum * conversionFactor;
+  const lengthM = lengthNum * conversionFactor;
+
+  // Calculate material quantities (in original units for display)
+  const floorArea = widthNum * lengthNum;
+  const wallArea1 = widthNum * heightNum * 2;
+  const wallArea2 = lengthNum * heightNum * 2;
+  const totalWallArea = wallArea1 + wallArea2;
+  const ceilingArea = floorArea;
+
+  const paintLiters = totalWallArea * 0.015;
+  const tileSqFt = unitType === 'ft' ? floorArea : floorArea * 10.764;
+
+  res.json({
+    dimensions: {
+      height: heightNum,
+      width: widthNum,
+      length: lengthNum,
+      heightM: parseFloat(heightM.toFixed(3)),
+      widthM: parseFloat(widthM.toFixed(3)),
+      lengthM: parseFloat(lengthM.toFixed(3))
+    },
+    unit: unitType,
+    materials: {
+      floorArea: floorArea.toFixed(2) + ' sq ' + unitType,
+      totalWallArea: totalWallArea.toFixed(2) + ' sq ' + unitType,
+      ceilingArea: ceilingArea.toFixed(2) + ' sq ' + unitType,
+      paintNeeded: paintLiters.toFixed(2) + ' liters (2 coats)',
+      tileArea: tileSqFt.toFixed(2) + ' sq ' + (unitType === 'ft' ? 'ft' : 'm')
+    }
+  });
 });
 
 // Health check
@@ -148,8 +220,32 @@ app.use((err, req, res, next) => {
 
 // Start server only when run directly
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Sokogate Calculator running on port ${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ Error: Port ${PORT} is already in use!\n`);
+      console.error('Solutions:');
+      console.error('   1. Use a different port: PORT=3001 npm start');
+      console.error('   2. Kill the process using port 3000:');
+      console.error('      lsof -ti:3000 | xargs kill -9');
+      console.error('   3. For cPanel: Restart the app in "Setup Node.js App" panel');
+      console.error('\n');
+      process.exit(1);
+    } else {
+      console.error('Server error:', err.message);
+      process.exit(1);
+    }
+  });
+
+  // Graceful shutdown on SIGTERM
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      process.exit(0);
+    });
   });
 }
 
