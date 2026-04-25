@@ -27,7 +27,7 @@ app.get('/sokogate-calc/calculate', (req, res) => {
 
 // Redirect /calculate to calculator page
 app.get('/calculate', (req, res) => {
-  res.redirect('/sokogate-calc/');
+  res.redirect('/sokogate-calc');
 });
 
 // Handle form submission
