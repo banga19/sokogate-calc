@@ -16,6 +16,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve calculator page at root
+app.get('/', (req, res) => {
+  res.render('index', { result: null, query: req.query });
+});
+
 // Serve calculator page
 app.get('/sokogate-calc', (req, res) => {
   res.render('index', { result: null, query: req.query });
