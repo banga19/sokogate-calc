@@ -136,17 +136,15 @@ document.addEventListener('DOMContentLoaded', function() {
       } catch (error) {
         console.error('Room calculation error:', error);
         showRoomError('Failed to calculate. Please try again.');
-      } finally {
-        if (roomBtn) {
-          roomBtn.disabled = false;
-          roomBtn.textContent = 'Calculate Materials';
-        }
+    } finally {
+      roomBtn.disabled = false;
+      roomBtn.textContent = 'Visualize Room';
+    }
       }
     });
   }
 
-  function displayRoomResults(result) {
-    if (!roomResults) return;
+function displayRoomResults(result) {
     roomResults.innerHTML = `
       <section class="results">
         <h3>Room Materials</h3>
@@ -172,10 +170,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </section>
     `;
+    document.getElementById('3d-room-container').style.display = 'block';
   }
 
-  function showRoomError(message) {
-    if (!roomResults) return;
+function showRoomError(message) {
     roomResults.innerHTML = `
       <div class="error">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span>${message}</span>
       </div>
     `;
+    document.getElementById('3d-room-container').style.display = 'none';
   }
 
   // Initialize room 3D scene

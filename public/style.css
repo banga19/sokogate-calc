@@ -396,7 +396,11 @@ html {
   border: 2px solid var(--border);
   background: #f1f5f9;
   position: relative;
-  cursor: grab;
+}
+
+.room-visualizer .btn {
+  max-width: 300px;
+  margin: 20px auto 0;
 }
 
 #3d-room-container:active {
@@ -428,9 +432,13 @@ html {
     font-size: 20px;
   }
 
-  #3d-room-container {
-    height: 280px;
-  }
+   #3d-room-container {
+     height: 280px;
+   }
+
+   .room-visualizer .btn {
+     max-width: 250px;
+   }
 
   .room-form-row {
     grid-template-columns: 1fr;
