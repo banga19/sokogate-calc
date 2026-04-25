@@ -120,6 +120,8 @@ select {
   padding-right: 48px;
 }
 
+optgroup {\n  font-weight: 600;\n  color: #374151;\n  background: #f3f4f6;\n}\n\noptgroup option {\n  font-weight: 400;\n  color: #1f2937;\n  padding-left: 12px;\n}
+
 input::placeholder {
   color: #94a3b8;
 }
@@ -214,6 +216,32 @@ input::placeholder {
   text-align: center;
   font-weight: 500;
   border: 2px solid #fecaca;
+}
+
+.result-summary {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.material-type-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
 }
 
 #3d-container {
