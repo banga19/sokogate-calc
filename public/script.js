@@ -310,5 +310,44 @@ styleSheet.textContent = `
     color: #1f2937;
     padding-left: 12px;
   }
+
+  .room-visualizer {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .room-visualizer h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #374151;
+  }
+
+  .room-visualizer form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+  }
+
+  .room-visualizer .form-group {
+    margin-bottom: 15px;
+  }
+
+  .room-visualizer .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  #room-results {
+    margin-bottom: 20px;
+  }
+
+  .room-hint {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 `;
 document.head.appendChild(styleSheet);
