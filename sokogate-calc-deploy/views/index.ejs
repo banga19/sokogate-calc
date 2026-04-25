@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sokogate Construction Materials Calculator</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/sokogate-calc/style.css">
 </head>
 <body>
   <div class="container">
@@ -300,11 +300,11 @@
     <% } %>
   </div>
 
-  <script src="/three.min.js"></script>
-  <script src="/3d-room.js"></script>
+  <script src="/sokogate-calc/three.min.js"></script>
+  <script src="/sokogate-calc/3d-room.js"></script>
   <script>
     const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
   </script>
-  <script src="/script.js"></script>
+  <script src="/sokogate-calc/script.js"></script>
 </body>
 </html>
