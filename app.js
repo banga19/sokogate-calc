@@ -37,7 +37,7 @@ app.get('/calculate', (req, res) => {
 
 // Handle form submission
 app.post('/sokogate-calc/calculate', (req, res) => {
-  const { area, materialType, thickness, tileSize } = req.body;
+  const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
 
@@ -48,6 +48,11 @@ app.post('/sokogate-calc/calculate', (req, res) => {
 
   const thicknessNum = parseFloat(thickness) || 4;
   const tileSizeNum = parseFloat(tileSize) || 12;
+
+  // Parse room dimensions
+  const roomWidthNum = parseFloat(roomWidth) || 0;
+  const roomHeightNum = parseFloat(roomHeight) || 0;
+  const roomLengthNum = parseFloat(roomLength) || 0;
 
   try {
     switch (materialType) {
@@ -125,6 +130,12 @@ app.post('/sokogate-calc/calculate', (req, res) => {
       default:
         result = { error: 'Invalid material type selected' };
     }
+
+    // Attach room dimensions to result
+    result.roomWidth = roomWidthNum;
+    result.roomHeight = roomHeightNum;
+    result.roomLength = roomLengthNum;
+
     res.render('index', { result, query: req.query });
   } catch (err) {
     console.error('Calculation error:', err);

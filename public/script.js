@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const submitBtn = document.querySelector('.btn');
   const originalBtnText = submitBtn.textContent;
 
+  // Room dimension inputs
+  const roomWidthInput = document.getElementById('roomWidth');
+  const roomLengthInput = document.getElementById('roomLength');
+  const roomHeightInput = document.getElementById('roomHeight');
+  const areaInput = document.getElementById('area');
+
   // Toggle conditional fields based on material selection
   materialTypeSelect.addEventListener('change', function() {
     const selectedValue = this.value;
@@ -23,6 +29,32 @@ document.addEventListener('DOMContentLoaded', function() {
       tileSizeGroup.style.animation = 'slideDown 0.3s ease-out';
     }
   });
+
+  // Auto-calculate area from room dimensions
+  function updateAreaFromDimensions() {
+    const width = parseFloat(roomWidthInput?.value) || 0;
+    const length = parseFloat(roomLengthInput?.value) || 0;
+    if (width > 0 && length > 0) {
+      areaInput.value = (width * length).toFixed(2);
+    }
+    if (typeof update3DPreview === 'function') {
+      update3DPreview();
+    }
+  }
+
+  if (roomWidthInput) {
+    roomWidthInput.addEventListener('input', updateAreaFromDimensions);
+  }
+  if (roomLengthInput) {
+    roomLengthInput.addEventListener('input', updateAreaFromDimensions);
+  }
+  if (roomHeightInput) {
+    roomHeightInput.addEventListener('input', function() {
+      if (typeof update3DPreview === 'function') {
+        update3DPreview();
+      }
+    });
+  }
 
   // Form submission with validation and loading state
   form.addEventListener('submit', function(e) {
@@ -48,11 +80,17 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Initialize 3D scene
-  init3DScene();
+  if (typeof init3DScene === 'function') {
+    init3DScene();
+  }
 
   // Render results with staggered animation
   if (typeof resultData === 'object' && resultData !== null && !resultData.error) {
-    setTimeout(() => renderResults(resultData), 100);
+    setTimeout(() => {
+      if (typeof renderResults === 'function') {
+        renderResults(resultData);
+      }
+    }, 100);
   }
 
   // Helper: Show inline error message

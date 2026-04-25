@@ -27,3 +27,15 @@
 - [ ] Verify health check endpoint works
 - [ ] Test all calculator functions
 - [ ] Verify 3D visualization loads
+
+---
+
+# Styling & 3D Room Feature - TODO
+
+## Steps
+- [ ] Fix styling: center input fields and results (`style.css`)
+- [ ] Add room dimension inputs: Width, Length, Height (`index.ejs`)
+- [ ] Add frontend logic for auto-area and 3D preview (`script.js`)
+- [ ] Add backend support for room dimensions (`app.js`)
+- [ ] Implement 3D room wireframe with dimension labels (`3d-room.js`)
+- [ ] Test all changes locally
