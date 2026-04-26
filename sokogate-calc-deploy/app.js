@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use('/sokogate-calc', express.static(path.join(__dirname, 'public')));
+app.use('/repositories/sokogate-calc', express.static(path.join(__dirname, 'public')));
 
 // Serve calculator page at root
 app.get('/', (req, res) => {
@@ -23,21 +23,21 @@ app.get('/', (req, res) => {
 });
 
 // Serve calculator page
-app.get('/sokogate-calc', (req, res) => {
+app.get('/repositories/sokogate-calc', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
-app.get('/sokogate-calc/calculate', (req, res) => {
+app.get('/repositories/sokogate-calc/calculate', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
 // Redirect /calculate to calculator page
 app.get('/calculate', (req, res) => {
-  res.redirect('/sokogate-calc');
+  res.redirect('/repositories/sokogate-calc');
 });
 
 // Handle form submission
-app.post('/sokogate-calc/calculate', (req, res) => {
+app.post('/repositories/sokogate-calc/calculate', (req, res) => {
   const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);

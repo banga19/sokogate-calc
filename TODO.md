@@ -1,29 +1,25 @@
-# Sokogate Calculator — Emergency Repair TODO
+# Sokogate Calculator — Production Path Fix
 
 ## Root Cause
-The "mod" commits (mod2 through mod6) corrupted `views/index.ejs` and `public/script.js` while attempting to modernize the UI to match production. Commit `2a4090e` was the last working state.
+Production app installed at `/repositories/sokogate-calc/` but code configured for `/sokogate-calc/`. All routes and asset paths needed updating to match cPanel deployment directory.
 
-## Repair Steps
+## Fix Steps
 
-- [x] **Step 1**: Reconstruct `views/index.ejs`
-  - Preserve modern HTML structure (header, hero, cards, responsive grid)
-  - Fix all unclosed HTML tags
-  - Restore correct EJS conditional logic for results rendering
-  - Keep production asset paths (`/sokogate-calc/...`)
-  - Ensure all DOM elements expected by `script.js` exist
+- [x] **Step 1**: Update Express.js routes
+  - Changed static file serving from `/sokogate-calc` to `/repositories/sokogate-calc`
+  - Updated GET/POST routes to use new prefix
+  - Maintained API endpoint paths
 
-- [x] **Step 2**: Fix `public/script.js`
-  - Fix broken `try/catch/finally` brace alignment in room visualizer fetch handler
-  - Keep `displayRoomResults` and `showRoomError` inside `DOMContentLoaded`
-  - Preserve modern additions (room visualizer CSS, 3D container show/hide)
-  - Ensure `roomBtn` null checks exist
+- [x] **Step 2**: Update HTML template asset paths
+  - Changed CSS link: `/sokogate-calc/style.css` → `/repositories/sokogate-calc/style.css`
+  - Changed JS scripts: `/sokogate-calc/script.js` → `/repositories/sokogate-calc/script.js`
+  - Updated form action and navigation links
 
 - [x] **Step 3**: Test locally
-  - Start server on port 3000
-  - Verify `GET /sokogate-calc/` renders without 500
-  - Test all 8 material calculations
-  - Test room visualizer API endpoint
+  - Verified `GET /repositories/sokogate-calc/` renders correctly (HTTP 200)
+  - Confirmed asset paths load properly
+  - Tested route functionality
 
-- [x] **Step 4**: Sync to deploy directory
-  - Copy fixed files to `sokogate-calc-deploy/`
-  - Run `deploy-prep.sh` if available
+- [x] **Step 4**: Regenerate deployment package
+  - Synced updated files to `sokogate-calc-deploy/`
+  - Created new `sokogate-calc-cpanel.zip` with corrected paths
