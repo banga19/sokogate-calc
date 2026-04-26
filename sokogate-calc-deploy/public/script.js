@@ -116,8 +116,11 @@ document.addEventListener('DOMContentLoaded', function() {
         roomBtn.textContent = 'Calculating...';
       }
 
+      const basePath = window.APP_BASE_PATH || '';
+      const apiUrl = basePath ? `${basePath}/api/calculate-room` : '/api/calculate-room';
+
       try {
-        const response = await fetch('/api/calculate-room', {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
