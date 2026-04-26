@@ -12,8 +12,9 @@
     "sokogate"
   ],
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "stop": "pkill -f 'node src/server.js' || echo 'No running processes found'",
     "deploy": "npm install && npm start"
   },
 
