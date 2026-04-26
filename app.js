@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
@@ -14,6 +15,12 @@ app.use((req, res, next) => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Enable CORS for iframe integration
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'https://ultimotradingltd.co.ke',
+  credentials: true
+}));
 
 // Inject basePath for templates
 app.use((req, res, next) => {
