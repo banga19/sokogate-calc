@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BASE_PATH = process.env.BASE_PATH || '/sokogate-calc';
+const BASE_PATH = process.env.BASE_PATH || '/Calculate';
 
 // Logging middleware
 app.use((req, res, next) => {

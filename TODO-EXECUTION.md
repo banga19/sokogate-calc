@@ -11,5 +11,13 @@
   - `views/index.ejs` — OK
   - `.htaccess` — OK
 
+- [x] 6. Fix `deploy-prep.sh` — ensure WordPress integration files are included
+  - Added `cp sokogate-calculator-wordpress-plugin.php` to deploy script
+  - Added `cp WORDPRESS-INTEGRATION-GUIDE.md` to deploy script
+  - Improved ZIP structure: flat files for direct cPanel extraction
 
-
+- [x] 7. Regenerate deployment package with fixes
+  - ZIP now contains 13 files (flat structure, no nested subfolder)
+  - Includes `sokogate-calculator-wordpress-plugin.php`
+  - Includes `WORDPRESS-INTEGRATION-GUIDE.md`
+  - Verified: `unzip -l` confirms correct structure

@@ -32,14 +32,16 @@ cp package-lock.json "$DEPLOY_DIR/"
 cp .npmrc "$DEPLOY_DIR/"
 cp .htaccess "$DEPLOY_DIR/"
 cp DEPLOYMENT.md "$DEPLOY_DIR/"
+cp sokogate-calculator-wordpress-plugin.php "$DEPLOY_DIR/"
+cp WORDPRESS-INTEGRATION-GUIDE.md "$DEPLOY_DIR/"
 
 # Copy directories
 cp -r views "$DEPLOY_DIR/"
 cp -r public "$DEPLOY_DIR/"
 
-# Create the ZIP file
+# Create the ZIP file (flat structure for direct cPanel extraction)
 echo "📦 Creating ZIP archive: $ZIP_NAME"
-zip -r "$ZIP_NAME" "$DEPLOY_DIR" -x "*.DS_Store" -x "*.git*"
+cd "$DEPLOY_DIR" && zip -r "../$ZIP_NAME" . -x "*.DS_Store" -x "*.git*" && cd ..
 
 # Show summary
 echo ""
@@ -53,7 +55,7 @@ echo "📦 ZIP File: $ZIP_NAME"
 echo ""
 echo "📤 Next Steps:"
 echo "1. Upload $ZIP_NAME to your cPanel File Manager"
-echo "2. Extract to your desired directory"
+echo "2. Extract to your desired directory (e.g., /Calculate/)"
 echo "3. Follow DEPLOYMENT.md instructions"
 echo ""
 echo "🌐 Upload these files to cPanel and run: npm install"

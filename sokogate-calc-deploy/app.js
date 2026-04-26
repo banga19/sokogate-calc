@@ -4,7 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BASE_PATH = process.env.BASE_PATH || '/sokogate-calc';
+const BASE_PATH = process.env.BASE_PATH || '/Calculate';
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -156,65 +156,7 @@ app.post(`${BASE_PATH}/calculate`, (req, res) => {
   }
 });
 
-// API endpoint for room visualizer
-app.post(`${BASE_PATH}/api/calculate-room`, (req, res) => {
-  const { height, width, length, unit } = req.body;
 
-  const heightNum = parseFloat(height);
-  const widthNum = parseFloat(width);
-  const lengthNum = parseFloat(length);
-  const unitType = unit === 'm' ? 'm' : 'ft';
-
-  const errors = [];
-  if (isNaN(heightNum) || heightNum <= 0) {
-    errors.push('Height must be a positive number greater than 0.');
-  }
-  if (isNaN(widthNum) || widthNum <= 0) {
-    errors.push('Width must be a positive number greater than 0.');
-  }
-  if (isNaN(lengthNum) || lengthNum <= 0) {
-    errors.push('Length must be a positive number greater than 0.');
-  }
-
-  if (errors.length > 0) {
-    return res.status(400).json({ error: errors.join(' ') });
-  }
-
-  // Convert to meters for consistent 3D scaling (1 unit = 1 meter)
-  const conversionFactor = unitType === 'ft' ? 0.3048 : 1;
-  const heightM = heightNum * conversionFactor;
-  const widthM = widthNum * conversionFactor;
-  const lengthM = lengthNum * conversionFactor;
-
-  // Calculate material quantities (in original units for display)
-  const floorArea = widthNum * lengthNum;
-  const wallArea1 = widthNum * heightNum * 2;
-  const wallArea2 = lengthNum * heightNum * 2;
-  const totalWallArea = wallArea1 + wallArea2;
-  const ceilingArea = floorArea;
-
-  const paintLiters = totalWallArea * 0.015;
-  const tileSqFt = unitType === 'ft' ? floorArea : floorArea * 10.764;
-
-  res.json({
-    dimensions: {
-      height: heightNum,
-      width: widthNum,
-      length: lengthNum,
-      heightM: parseFloat(heightM.toFixed(3)),
-      widthM: parseFloat(widthM.toFixed(3)),
-      lengthM: parseFloat(lengthM.toFixed(3))
-    },
-    unit: unitType,
-    materials: {
-      floorArea: floorArea.toFixed(2) + ' sq ' + unitType,
-      totalWallArea: totalWallArea.toFixed(2) + ' sq ' + unitType,
-      ceilingArea: ceilingArea.toFixed(2) + ' sq ' + unitType,
-      paintNeeded: paintLiters.toFixed(2) + ' liters (2 coats)',
-      tileArea: tileSqFt.toFixed(2) + ' sq ' + (unitType === 'ft' ? 'ft' : 'm')
-    }
-  });
-});
 
 // Health check
 app.get(`${BASE_PATH}/health`, (req, res) => {

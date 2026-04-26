@@ -1,24 +1,24 @@
-# Sokogate-Calc — Subfolder Deployment Configuration
-# Place this .htaccess inside the app directory (e.g., public_html/repositories/sokogate-calc/)
+# Sokogate-Calc — WordPress Integration Configuration
+# Place this .htaccess inside the /Calculate/ directory for iframe deployment
+# For WordPress page integration at https://ultimotradingltd.co.ke/Calculate/
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     # Set the base for all relative rewrites to the subfolder path
-    RewriteBase /repositories/sokogate-calc/
+    RewriteBase /Calculate/
 
     # 1. Allow direct access to actual files (CSS, JS, images, fonts, etc.)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # 2. For a static SPA: deep-link fallback to index.html
-    # Uncomment the line below ONLY if serving a pre-built static SPA (React/Vite/etc.)
-    # RewriteRule ^ index.html [L]
-
-    # 3. For Node.js/Express (Passenger): ensure the request reaches the app
-    # cPanel's Passenger configuration usually handles this automatically.
-    # If NOT using Passenger, proxy to your Node port (requires mod_proxy):
+    # 2. For Node.js/Express: proxy requests to the app
+    # When using iframe integration, uncomment the line below:
     # RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+
+    # 3. Alternative: For static export (if app is converted to static)
+    # Uncomment the line below ONLY if serving a pre-built static SPA:
+    # RewriteRule ^ index.html [L]
 </IfModule>
 
 # Enable long-term caching for static assets
