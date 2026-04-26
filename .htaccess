@@ -1,18 +1,27 @@
-# Sokogate-Calc cPanel URL Rewriting
-# This file ensures clean URLs and proper routing for the Node.js app
+# Sokogate-Calc — Subfolder Deployment Configuration
+# Place this .htaccess inside the app directory (e.g., public_html/repositories/sokogate-calc/)
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
-    # If the requested filename exists, serve it directly
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    
-    # Otherwise, forward the request to the Node.js app
-    RewriteRule ^(.*)$ /sokogate-calc/$1 [QSA,L]
+    # Set the base for all relative rewrites to the subfolder path
+    RewriteBase /repositories/sokogate-calc/
+
+    # 1. Allow direct access to actual files (CSS, JS, images, fonts, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 2. For a static SPA: deep-link fallback to index.html
+    # Uncomment the line below ONLY if serving a pre-built static SPA (React/Vite/etc.)
+    # RewriteRule ^ index.html [L]
+
+    # 3. For Node.js/Express (Passenger): ensure the request reaches the app
+    # cPanel's Passenger configuration usually handles this automatically.
+    # If NOT using Passenger, proxy to your Node port (requires mod_proxy):
+    # RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 </IfModule>
 
-# Enable CORS for static assets (optional)
+# Enable long-term caching for static assets
 <IfModule mod_headers.c>
     <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
         Header set Cache-Control "max-age=31536000, public"

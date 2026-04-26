@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/sokogate-calc/style.css?v=1.0.2">
+  <link rel="stylesheet" href="<%= basePath %>/style.css?v=1.0.2">
 </head>
 <body>
   <div class="app-wrapper">
     <!-- Header -->
     <header class="site-header">
       <div class="container">
-        <a href="/sokogate-calc" class="brand" aria-label="Sokogate Home">
+        <a href="<%= basePath %>" class="brand" aria-label="Sokogate Home">
           <div class="brand-icon">S</div>
           <div class="brand-text">
             <span class="brand-name">Sokogate</span>
@@ -30,7 +30,6 @@
             </svg>
           </button>
         </div>
-      </div>
     </header>
 
     <!-- Hero -->
@@ -46,7 +45,6 @@
           </svg>
           <span>8 Material Types Supported</span>
         </div>
-      </div>
     </section>
 
     <!-- Main Content -->
@@ -64,10 +62,9 @@
             <div>
               <div class="card-header-title">Project Details</div>
               <div class="card-header-subtitle">Enter your measurements</div>
-            </div>
           </div>
           <div class="card-body">
-            <form action="/sokogate-calc/calculate" method="POST" id="calcForm" novalidate>
+            <form action="<%= basePath %>/calculate" method="POST" id="calcForm" novalidate>
               <!-- Area Input -->
               <div class="form-group">
                 <label for="area" class="form-label">
@@ -97,7 +94,6 @@
                   </svg>
                   Total surface area to be covered
                 </div>
-              </div>
 
               <!-- Room Dimensions -->
               <div class="form-group">
@@ -119,7 +115,6 @@
                   <div class="form-group">
                     <input type="number" id="roomHeight" name="roomHeight" class="form-input" min="0.1" step="0.01" placeholder="Height (ft)">
                   </div>
-                </div>
                 <div class="form-hint">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
@@ -127,7 +122,6 @@
                   </svg>
                   Auto-calculates area from width × length
                 </div>
-              </div>
 
               <!-- Material Type -->
               <div class="form-group">
@@ -189,7 +183,6 @@
                   </svg>
                   Standard concrete slab: 4-6 inches
                 </div>
-              </div>
 
               <!-- Tile Size Field (shown for tiles) -->
               <div class="form-group" id="tileSizeGroup" style="display: none;">
@@ -215,7 +208,6 @@
                   </svg>
                   10% wastage included automatically
                 </div>
-              </div>
 
               <button type="submit" class="btn btn-primary btn-block" id="calcSubmitBtn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -226,7 +218,6 @@
               </button>
             </form>
           </div>
-        </div>
         
         <!-- Results Column -->
         <div class="results-column">
@@ -244,7 +235,6 @@
                   <div>
                     <div class="card-header-title">Calculation Error</div>
                     <div class="card-header-subtitle">Please check your input</div>
-                  </div>
                 </div>
                 <div class="card-body">
                   <div class="error">
@@ -255,7 +245,6 @@
                     </svg>
                     <span><%= result.error %></span>
                   </div>
-                </div>
               </div>
             <% } else { %>
               <div class="card results-section">
@@ -269,7 +258,6 @@
                   <div>
                     <div class="card-header-title">Calculation Results</div>
                     <div class="card-header-subtitle">Material estimates for your project</div>
-                  </div>
                 </div>
                 <div class="card-body">
                   <div class="result-summary">
@@ -390,7 +378,6 @@
                     </div>
                   <% } %>
                 </div>
-              </div>
             <% } %>
           <% } else { %>
             <div class="card results-section">
@@ -404,17 +391,14 @@
                 <div>
                   <div class="card-header-title">Calculation Results</div>
                   <div class="card-header-subtitle">Material estimates for your project</div>
-                </div>
               </div>
               <div class="card-body">
                 <div class="empty-state">
                   <p>Enter project details and click <strong>Calculate Materials</strong> to see estimates.</p>
                 </div>
-              </div>
             </div>
           <% } %>
         </div>
-      </div>
       
       <!-- 3D Preview Container -->
       <div id="3d-container"></div>
@@ -444,7 +428,6 @@
                 <option value="m">Meters (m)</option>
               </select>
             </div>
-          </div>
           <button type="submit" class="btn">Visualize Room</button>
         </form>
         <div id="room-results"></div>
@@ -461,11 +444,14 @@
     <% } %>
   </div>
 
-  <script src="/sokogate-calc/three.min.js"></script>
-  <script src="/sokogate-calc/3d-room.js"></script>
+  <script>
+    window.APP_BASE_PATH = "<%= basePath %>";
+  </script>
+  <script src="<%= basePath %>/three.min.js"></script>
+  <script src="<%= basePath %>/3d-room.js"></script>
   <script>
     const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
   </script>
-  <script src="/sokogate-calc/script.js"></script>
+  <script src="<%= basePath %>/script.js"></script>
 </body>
 </html>

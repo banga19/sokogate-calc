@@ -4,6 +4,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const BASE_PATH = process.env.BASE_PATH || '/sokogate-calc';
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -13,35 +14,42 @@ app.use((req, res, next) => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Inject basePath for templates
+app.use((req, res, next) => {
+  res.locals.basePath = BASE_PATH;
+  next();
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use('/sokogate-calc', express.static(path.join(__dirname, 'public')));
+app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
 
-// Serve calculator page at root
+// Serve calculator page at root (for local dev convenience)
 app.get('/', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
 // Serve calculator page
-app.get('/sokogate-calc', (req, res) => {
+app.get(BASE_PATH, (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
-app.get('/sokogate-calc/', (req, res) => {
+app.get(`${BASE_PATH}/`, (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
-app.get('/sokogate-calc/calculate', (req, res) => {
+app.get(`${BASE_PATH}/calculate`, (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
 // Redirect /calculate to calculator page
 app.get('/calculate', (req, res) => {
-  res.redirect('/sokogate-calc');
+  res.redirect(BASE_PATH);
 });
 
 // Handle form submission
-app.post('/sokogate-calc/calculate', (req, res) => {
+app.post(`${BASE_PATH}/calculate`, (req, res) => {
   const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
@@ -149,7 +157,7 @@ app.post('/sokogate-calc/calculate', (req, res) => {
 });
 
 // API endpoint for room visualizer
-app.post('/api/calculate-room', (req, res) => {
+app.post(`${BASE_PATH}/api/calculate-room`, (req, res) => {
   const { height, width, length, unit } = req.body;
 
   const heightNum = parseFloat(height);
@@ -209,7 +217,7 @@ app.post('/api/calculate-room', (req, res) => {
 });
 
 // Health check
-app.get('/health', (req, res) => {
+app.get(`${BASE_PATH}/health`, (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
