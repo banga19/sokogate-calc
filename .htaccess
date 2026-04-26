@@ -14,7 +14,7 @@
 
     # 2. For Node.js/Express: proxy requests to the app
     # When using iframe integration, uncomment the line below:
-    # RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+    RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 
     # 3. Alternative: For static export (if app is converted to static)
     # Uncomment the line below ONLY if serving a pre-built static SPA:
