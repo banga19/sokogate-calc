@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/repositories/sokogate-calc/style.css?v=1.0.2">
+  <link rel="stylesheet" href="/sokogate-calc/style.css?v=1.0.2">
 </head>
 <body>
   <div class="app-wrapper">
     <!-- Header -->
     <header class="site-header">
       <div class="container">
-        <a href="/repositories/sokogate-calc" class="brand" aria-label="Sokogate Home">
+        <a href="/sokogate-calc" class="brand" aria-label="Sokogate Home">
           <div class="brand-icon">S</div>
           <div class="brand-text">
             <span class="brand-name">Sokogate</span>
@@ -67,7 +67,7 @@
             </div>
           </div>
           <div class="card-body">
-            <form action="/repositories/sokogate-calc/calculate" method="POST" id="calcForm" novalidate>
+            <form action="/sokogate-calc/calculate" method="POST" id="calcForm" novalidate>
               <!-- Area Input -->
               <div class="form-group">
                 <label for="area" class="form-label">
@@ -461,11 +461,11 @@
     <% } %>
   </div>
 
-  <script src="/repositories/sokogate-calc/three.min.js"></script>
-  <script src="/repositories/sokogate-calc/3d-room.js"></script>
+  <script src="/sokogate-calc/three.min.js"></script>
+  <script src="/sokogate-calc/3d-room.js"></script>
   <script>
     const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
   </script>
-  <script src="/repositories/sokogate-calc/script.js"></script>
+  <script src="/sokogate-calc/script.js"></script>
 </body>
 </html>
