@@ -1,16 +1,16 @@
-# 3D Room Visualizer Implementation - Progress Tracker
+# Sokogate Production UI Fix — Implementation Tracker
 
-- [x] Analyze project structure and current state
-- [x] Create comprehensive plan
-- [x] Get user approval
-- [x] Update `sokogate-calc/app.js` - Enhance `/api/calculate-room` endpoint
-- [x] Update `sokogate-calc/public/3d-room.js` - Merge material preview + enhanced room visualizer
-- [x] Update `sokogate-calc/public/script.js` - Add room visualizer form handler
-- [x] Update `sokogate-calc/views/index.ejs` - Add unit selector
-- [x] Update `sokogate-calc/public/style.css` - Centralize room visualizer styles
-- [x] Sync `sokogate-calc-deploy/app.js`
-- [x] Sync `sokogate-calc-deploy/public/3d-room.js`
-- [x] Sync `sokogate-calc-deploy/public/script.js`
-- [x] Sync `sokogate-calc-deploy/views/index.ejs`
-- [x] Sync `sokogate-calc-deploy/public/style.css`
-- [x] Test locally and verify
+## Root Causes Identified
+1. `views/index.ejs` is severely malformed (missing tags, mixed old/new structure, missing DOM elements)
+2. `sokogate-calc-deploy/public/style.css` contains old CSS, not the modern design system
+3. `sokogate-calc-deploy/views/index.ejs` is MISSING entirely
+4. `script.js` references non-existent DOM elements due to broken EJS
+
+## Implementation Steps
+- [ ] Step 1: Rewrite `views/index.ejs` with complete modern HTML matching CSS design system
+- [ ] Step 2: Update `public/script.js` — fix selectors, remove legacy injected styles
+- [ ] Step 3: Add cache-busting and production cache-control headers in `app.js`
+- [ ] Step 4: Sync all modern assets to `sokogate-calc-deploy/`
+- [ ] Step 5: Update `deploy-prep.sh` with validation checks
+- [ ] Step 6: Verify build package integrity
+
