@@ -103,13 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (roomForm) {
     roomForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-    const formData = new FormData(roomForm);
-    const data = {
-      height: formData.get('height'),
-      width: formData.get('width'),
-      length: formData.get('length'),
-      unit: formData.get('unit')
-    };
+      const formData = new FormData(roomForm);
+      const data = {
+        height: formData.get('height'),
+        width: formData.get('width'),
+        length: formData.get('length'),
+        unit: formData.get('unit') || 'ft'
+      };
 
       if (roomBtn) {
         roomBtn.disabled = true;
@@ -125,27 +125,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const result = await response.json();
 
-      if (response.ok) {
-        displayRoomResults(result);
-        if (typeof updateRoom3D === 'function') {
-          updateRoom3D(result.dimensions, result.unit);
-        }
-      }
+        if (response.ok) {
+          displayRoomResults(result);
+          if (typeof updateRoom3D === 'function') {
+            updateRoom3D(result.dimensions, result.unit);
+          }
         } else {
           showRoomError(result.error || 'Invalid input. Please check your dimensions.');
         }
       } catch (error) {
         console.error('Room calculation error:', error);
         showRoomError('Failed to calculate. Please try again.');
-    } finally {
-      roomBtn.disabled = false;
-      roomBtn.textContent = 'Visualize Room';
-    }
+      } finally {
+        if (roomBtn) {
+          roomBtn.disabled = false;
+          roomBtn.textContent = 'Visualize Room';
+        }
       }
     });
   }
 
-function displayRoomResults(result) {
+  function displayRoomResults(result) {
+    if (!roomResults) return;
     roomResults.innerHTML = `
       <section class="results">
         <h3>Room Materials</h3>
@@ -171,10 +172,12 @@ function displayRoomResults(result) {
         </div>
       </section>
     `;
-    document.getElementById('3d-room-container').style.display = 'block';
+    const roomContainer = document.getElementById('3d-room-container');
+    if (roomContainer) roomContainer.style.display = 'block';
   }
 
-function showRoomError(message) {
+  function showRoomError(message) {
+    if (!roomResults) return;
     roomResults.innerHTML = `
       <div class="error">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -185,7 +188,8 @@ function showRoomError(message) {
         <span>${message}</span>
       </div>
     `;
-    document.getElementById('3d-room-container').style.display = 'none';
+    const roomContainer = document.getElementById('3d-room-container');
+    if (roomContainer) roomContainer.style.display = 'none';
   }
 
   // Initialize room 3D scene
