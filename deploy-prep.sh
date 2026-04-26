@@ -1,15 +1,17 @@
 #!/bin/bash
 # Sokogate-Calc cPanel Deployment Preparation Script
-# This script creates a clean ZIP file ready for cPanel upload
+# Creates a clean ZIP file ready for cPanel upload
+
+set -euo pipefail
 
 echo "🚀 Sokogate-Calc cPanel Deployment Preparation"
 echo "================================================"
 
-# Create deployment directory
+# Configuration
 DEPLOY_DIR="sokogate-calc-deploy"
 ZIP_NAME="sokogate-calc-cpanel.zip"
 
-# Clean up any previous deployment
+# Clean up any previous deployment artifacts
 if [ -d "$DEPLOY_DIR" ]; then
     echo "🧹 Cleaning up previous deployment directory..."
     rm -rf "$DEPLOY_DIR"
@@ -24,24 +26,86 @@ fi
 mkdir -p "$DEPLOY_DIR"
 echo "📁 Created deployment directory: $DEPLOY_DIR"
 
-# Copy required files
-echo "📋 Copying deployment files..."
+# Copy required files (core application)
+echo "📋 Copying core application files..."
 cp app.js "$DEPLOY_DIR/"
 cp package.json "$DEPLOY_DIR/"
 cp package-lock.json "$DEPLOY_DIR/"
 cp .npmrc "$DEPLOY_DIR/"
-cp .htaccess "$DEPLOY_DIR/"
-cp DEPLOYMENT.md "$DEPLOY_DIR/"
-cp sokogate-calculator-wordpress-plugin.php "$DEPLOY_DIR/"
-cp WORDPRESS-INTEGRATION-GUIDE.md "$DEPLOY_DIR/"
 
-# Copy directories
+# Copy configuration
+echo "📋 Copying configuration files..."
+cp .htaccess "$DEPLOY_DIR/"
+
+# Copy template and static assets
+echo "📋 Copying views and public assets..."
 cp -r views "$DEPLOY_DIR/"
 cp -r public "$DEPLOY_DIR/"
 
+# Copy documentation (optional but helpful)
+echo "📋 Copying documentation..."
+cp DEPLOYMENT.md "$DEPLOY_DIR/" 2>/dev/null || true
+cp sokogate-calculator-wordpress-plugin.php "$DEPLOY_DIR/" 2>/dev/null || true
+cp WORDPRESS-INTEGRATION-GUIDE.md "$DEPLOY_DIR/" 2>/dev/null || true
+
 # Create the ZIP file (flat structure for direct cPanel extraction)
 echo "📦 Creating ZIP archive: $ZIP_NAME"
-cd "$DEPLOY_DIR" && zip -r "../$ZIP_NAME" . -x "*.DS_Store" -x "*.git*" && cd ..
+cd "$DEPLOY_DIR"
+zip -r "../$ZIP_NAME" . \
+    -x "*.DS_Store" \
+    -x "*.git*" \
+    -x "*.log" \
+    -x "node_modules/*" \
+    -x "logs/*"
+cd ..
+
+# Verify ZIP contents
+echo ""
+echo "🔍 Verifying ZIP structure..."
+FILE_COUNT=$(unzip -l "$ZIP_NAME" | tail -1 | awk '{print $2}')
+echo "   Files in ZIP: $FILE_COUNT"
+
+# Check for critical files
+echo "   Checking critical files..."
+if unzip -l "$ZIP_NAME" | grep -q "app.js"; then
+    echo "   ✅ app.js"
+else
+    echo "   ❌ app.js MISSING"
+    exit 1
+fi
+
+if unzip -l "$ZIP_NAME" | grep -q "package.json"; then
+    echo "   ✅ package.json"
+else
+    echo "   ❌ package.json MISSING"
+    exit 1
+fi
+
+if unzip -l "$ZIP_NAME" | grep -q "views/"; then
+    echo "   ✅ views/"
+else
+    echo "   ❌ views/ MISSING"
+    exit 1
+fi
+
+if unzip -l "$ZIP_NAME" | grep -q "public/"; then
+    echo "   ✅ public/"
+else
+    echo "   ❌ public/ MISSING"
+    exit 1
+fi
+
+# Check for files that should NOT be in ZIP
+echo "   Checking for excluded files..."
+if unzip -l "$ZIP_NAME" | grep -q "src/"; then
+    echo "   ⚠️  WARNING: src/ found in ZIP (should be excluded)"
+fi
+if unzip -l "$ZIP_NAME" | grep -q ".env"; then
+    echo "   ⚠️  WARNING: .env found in ZIP (should be excluded)"
+fi
+if unzip -l "$ZIP_NAME" | grep -q "node_modules/"; then
+    echo "   ⚠️  WARNING: node_modules/ found in ZIP (should be excluded)"
+fi
 
 # Show summary
 echo ""
@@ -49,13 +113,18 @@ echo "✅ Deployment package created successfully!"
 echo ""
 echo "📊 Package Contents:"
 echo "-------------------"
-ls -la "$DEPLOY_DIR/"
+unzip -l "$ZIP_NAME" | tail -n +4 | head -n -2
 echo ""
-echo "📦 ZIP File: $ZIP_NAME"
+echo "📦 ZIP File: $ZIP_NAME ($(du -h "$ZIP_NAME" | cut -f1))"
 echo ""
 echo "📤 Next Steps:"
 echo "1. Upload $ZIP_NAME to your cPanel File Manager"
 echo "2. Extract to your desired directory (e.g., /Calculate/)"
-echo "3. Follow DEPLOYMENT.md instructions"
+echo "3. Run: npm install"
+echo "4. Start the application via cPanel Node.js interface"
 echo ""
-echo "🌐 Upload these files to cPanel and run: npm install"
+echo "🌐 cPanel Configuration:"
+echo "   - Application root: /home/username/public_html/Calculate"
+echo "   - Application URL: https://yourdomain.com/Calculate"
+echo "   - Startup file: app.js"
+echo "   - Node.js version: 18.x or 20.x"

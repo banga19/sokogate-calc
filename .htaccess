@@ -1,5 +1,12 @@
-# Sokogate-Calc — WordPress Integration Configuration
-# Place this .htaccess inside the /Calculate/ directory for iframe deployment
+# Sokogate-Calc — cPanel Deployment Configuration
+# 
+# IMPORTANT: For standard cPanel Node.js app (Phusion Passenger),
+# this file does NOT need rewrite rules. Passenger handles routing.
+# 
+# ONLY uncomment the proxy rule below if:
+#   1. Using WordPress iframe integration, OR
+#   2. Running Node.js manually behind Apache (not via Passenger)
+#
 # For WordPress page integration at https://ultimotradingltd.co.ke/Calculate/
 
 <IfModule mod_rewrite.c>
@@ -13,8 +20,9 @@
     RewriteRule ^ - [L]
 
     # 2. For Node.js/Express: proxy requests to the app
-    # When using iframe integration, uncomment the line below:
-    RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+    # When using iframe integration or manual Node.js behind Apache,
+    # uncomment the line below and ensure the port matches your app:
+    # RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 
     # 3. Alternative: For static export (if app is converted to static)
     # Uncomment the line below ONLY if serving a pre-built static SPA:

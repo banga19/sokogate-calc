@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
@@ -15,6 +16,12 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Enable CORS for iframe integration
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'https://ultimotradingltd.co.ke',
+  credentials: true
+}));
+
 // Inject basePath for templates
 app.use((req, res, next) => {
   res.locals.basePath = BASE_PATH;
@@ -23,33 +30,19 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve calculator page at root (for local dev convenience)
+// Serve calculator page
 app.get('/', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
-// Serve calculator page
-app.get(BASE_PATH, (req, res) => {
-  res.render('index', { result: null, query: req.query });
-});
-
-app.get(`${BASE_PATH}/`, (req, res) => {
-  res.render('index', { result: null, query: req.query });
-});
-
-app.get(`${BASE_PATH}/calculate`, (req, res) => {
-  res.render('index', { result: null, query: req.query });
-});
-
-// Redirect /calculate to calculator page
 app.get('/calculate', (req, res) => {
-  res.redirect(BASE_PATH);
+  res.render('index', { result: null, query: req.query });
 });
 
 // Handle form submission
-app.post(`${BASE_PATH}/calculate`, (req, res) => {
+app.post('/calculate', (req, res) => {
   const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
@@ -159,7 +152,7 @@ app.post(`${BASE_PATH}/calculate`, (req, res) => {
 
 
 // Health check
-app.get(`${BASE_PATH}/health`, (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 

@@ -66,6 +66,31 @@
   - **Details:** cPanel File Manager upload, Node.js app restart, cache clearing
   - **Status:** ZIP regenerated on 2026-04-26 with all dynamic `BASE_PATH` fixes, corrected HTML structure, updated `.htaccess`, and added CORS support
 
+### Deployment Fixes (2026-04-27)
+- [x] **Fix `package.json`** — Corrected start script and dependencies
+  - **Problem:** `"start": "node src/server.js"` but no `src/` directory in deployment; extra unused dependencies
+  - **Fix:** Changed to `"start": "node app.js"`, removed unused deps (`dotenv`, `express-rate-limit`, `helmet`, `joi`, `winston`), kept required deps (`express`, `body-parser`, `cors`, `ejs`)
+  - **Verification:** Local `npm install` succeeds, app starts correctly
+
+- [x] **Fix `app.js` routing** — Removed `BASE_PATH` prefix from Express routes
+  - **Problem:** Routes used `/Calculate` prefix but `.htaccess` proxy strips the prefix when forwarding to Node.js
+  - **Fix:** Changed routes to `/`, `/calculate`, `/health` (no prefix); kept `res.locals.basePath` for template asset URLs
+  - **Verification:** All endpoints return correct responses (`/health` → JSON, `/` → HTML 200, `/calculate` → HTML 200)
+
+- [x] **Fix `deploy-prep.sh`** — Creates clean flat ZIP structure
+  - **Problem:** ZIP contained root files + `sokogate-calc-deploy/` subdirectory + sensitive files (`.env`)
+  - **Fix:** Script now excludes `src/`, `.env`, `node_modules/`, logs, backups; creates truly flat 13-file ZIP
+  - **Verification:** `unzip -l` confirms flat structure, no subdirectories, correct file count
+
+- [x] **Fix `.htaccess`** — Commented out proxy rules by default
+  - **Problem:** Proxy rule was active by default, conflicting with cPanel Phusion Passenger routing
+  - **Fix:** Proxy rule now commented out; clear instructions added for WordPress iframe integration use case
+  - **Verification:** Safe for standard cPanel Node.js app deployment
+
+- [x] **Local deployment simulation** — Full end-to-end test
+  - **Method:** Extract ZIP → `npm install` → `node app.js` → `curl` tests
+  - **Results:** All tests passed (health JSON, main page, calculate page, static CSS/JS)
+
 - [ ] **Post-deployment verification** — Confirm modern UI in production
   - **Complexity:** Low | **Priority:** Critical | **Dependencies:** Production redeploy
   - **Details:** Visual parity check, 404 error resolution, functionality testing
@@ -91,6 +116,8 @@ Phase 1 (Foundation) → Phase 2 (Sync) → Phase 3 (Testing) → Phase 4 (Produ
 - ✅ **Performance:** Lighthouse scores >85 across metrics
 - ✅ **Accessibility:** WCAG 2.1 AA compliance
 - ✅ **Responsiveness:** Perfect layout on all device sizes
+- ✅ **Deployment Package:** Clean ZIP with correct structure and dependencies
+- ✅ **Local Testing:** All endpoints working correctly
 
 ## Timeline Estimate
 - **Phase 1:** Completed (2 days)
@@ -98,5 +125,4 @@ Phase 1 (Foundation) → Phase 2 (Sync) → Phase 3 (Testing) → Phase 4 (Produ
 - **Phase 3:** Completed (5 hours)
 - **Phase 4:** Pending (1 day for production deployment)
 
-**Total Project Time:** 4-5 days | **Current Progress:** 85% Complete
-
+**Total Project Time:** 4-5 days | **Current Progress:** 95% Complete
