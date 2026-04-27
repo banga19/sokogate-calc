@@ -72,13 +72,13 @@ All files in `sokogate-calc-deploy/` match the working local version:
    ```
 
 2. **cPanel File Manager:**
-   - Upload ZIP to `public_html/Calculate/`
-   - Extract in-place
+    - Upload ZIP to `public_html/repositories/`
+    - Extract to `public_html/repositories/sokogate-calc-deploy/`
 
 3. **cPanel → Setup Node.js App:**
    ```
    Node.js version:  18.x or 20.x
-   Application root: /home/username/public_html/Calculate
+    Application root: /home/ultimotr/public_html/repositories/sokogate-calc-deploy
    Startup file:     app.js
    Env variables:
      NODE_ENV=production
@@ -102,7 +102,7 @@ All files in `sokogate-calc-deploy/` match the working local version:
 
 ## Live Site Currently Shows "Nexus360" — Here's Why
 
-The folder `public_html/Calculate/` contains old static files from a previous deployment:
+The folder `public_html/repositories/sokogate-calc-deploy/` contains old static files from a previous deployment:
 - `index.html` (React app entry)
 - `assets/` folder (React build artifacts)
 
@@ -128,7 +128,7 @@ After deployment, run these checks:
 - [ ] `GET https://ultimotradingltd.co.ke/Calculate/style.css` → 200 + CSS content
 - [ ] `GET https://ultimotradingltd.co.ke/Calculate/script.js` → 200 + JS content
 - [ ] Browser console: 0 errors
-- [ ] No `index.html` or `assets/` in `/Calculate` folder on server
+ - [ ] No `index.html` or `assets/` in `sokogate-calc-deploy` folder on server
 - [ ] Node.js app status: "Running" in cPanel
 
 ---

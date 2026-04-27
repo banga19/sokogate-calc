@@ -32,7 +32,7 @@ The live version (`sokogate-calc-deploy/`) has been updated to match the working
 **CRITICAL:** The `/Calculate` folder currently contains a React app (Nexus360) that conflicts.
 
 **Via cPanel File Manager:**
-1. Go to `public_html/Calculate/`
+1. Go to `public_html/repositories/sokogate-calc-deploy/`
 2. **Delete if exists:**
    - `index.html`
    - `assets/` folder
@@ -41,7 +41,7 @@ The live version (`sokogate-calc-deploy/`) has been updated to match the working
 
 **Via SSH:**
 ```bash
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 rm -rf index.html assets/
 ```
 
@@ -53,19 +53,19 @@ rm -rf index.html assets/
 1. Download `sokogate-calc-cpanel.zip` from `/home/apop/sokogate-calc/`
 2. cPanel → File Manager → `public_html/`
 3. Upload ZIP
-4. Extract to `public_html/Calculate/`
-5. Verify 13 files at root of `/Calculate` (no nested folder)
+ 4. Extract to `public_html/repositories/sokogate-calc-deploy/`
+ 5. Verify 13 files at root of `sokogate-calc-deploy/` (no nested folder)
 
 **Option B: Direct File Copy (SSH)**
 ```bash
 # From your local machine or server where sokogate-calc-deploy/ is accessible:
-cp -r /home/apop/sokogate-calc-deploy/* /home/username/public_html/Calculate/
-cd /home/username/public_html/Calculate
+cp -r /home/apop/sokogate-calc-deploy/* /home/ultimotr/public_html/repositories/sokogate-calc-deploy/
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 ```
 
 Expected file structure:
 ```
-public_html/Calculate/
+public_html/repositories/sokogate-calc-deploy/
 ├── app.js
 ├── package.json
 ├── package-lock.json
@@ -90,7 +90,7 @@ public_html/Calculate/
    ```
    Node.js version:     18.x or 20.x
    Application mode:    Production
-   Application root:    /home/username/public_html/Calculate
+    Application root:    /home/ultimotr/public_html/repositories/sokogate-calc-deploy
    Application URL:     https://ultimotradingltd.co.ke/Calculate
    Startup file:        app.js
    ```
@@ -114,7 +114,7 @@ public_html/Calculate/
 
 **Via SSH:**
 ```bash
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 npm install --production
 ```
 
@@ -179,7 +179,7 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 **Cause:** Old `index.html` or `assets/` folder still present.
 
 **Fix:**
-1. Check: `ls -la /home/username/public_html/Calculate/`
+1. Check: `ls -la /home/ultimotr/public_html/repositories/sokogate-calc-deploy/`
 2. If `index.html` exists → delete it
 3. If `assets/` exists → `rm -rf assets/`
 4. Clear browser cache (hard refresh: `Ctrl+Shift+R`)
@@ -194,7 +194,7 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 **Check:**
 ```bash
 # SSH into server and view app.js
-grep "BASE_PATH" /home/username/public_html/Calculate/app.js
+grep "BASE_PATH" /home/ultimotr/public_html/repositories/sokogate-calc-deploy/app.js
 # Should show: const BASE_PATH = process.env.BASE_PATH || '/Calculate';
 # And: app.use(BASE_PATH, router);
 ```
@@ -218,7 +218,7 @@ app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
 
 **Cause:** Dependencies not installed.
 
-**Fix:** Run `npm install` in `/home/username/public_html/Calculate/`
+**Fix:** Run `npm install` in `/home/ultimotr/public_html/repositories/sokogate-calc-deploy/`
 
 ---
 

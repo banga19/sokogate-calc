@@ -101,8 +101,8 @@ The application includes health check endpoints and Docker health checks for mon
 ## 🚀 Deployment
 
 ### cPanel Deployment
-1. Upload `sokogate-calc-cpanel.zip` to `public_html/Calculate/`
-2. Extract and run `npm ci`
+ 1. Upload `sokogate-calc-cpanel.zip` to `public_html/repositories/`
+ 2. Extract to `public_html/repositories/sokogate-calc-deploy/` and run `npm ci`
 3. Configure Node.js app in cPanel with environment variables
 
 ### Cloud Deployment

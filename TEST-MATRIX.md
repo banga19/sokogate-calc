@@ -35,12 +35,12 @@ Before marking production as "working":
    - [x] No `src/`, `.env`, `node_modules/` in ZIP
 
 2. **cPanel Upload**
-   - [ ] Upload ZIP to `public_html/Calculate/`
-   - [ ] Extract in-place (files at `public_html/Calculate/*`)
-   - [ ] No `index.html` or `assets/` in `/Calculate` after extract
+    - [ ] Upload ZIP to `public_html/repositories/`
+    - [ ] Extract to `public_html/repositories/sokogate-calc-deploy/`
+    - [ ] No `index.html` or `assets/` in `repositories/sokogate-calc-deploy/` after extract
 
 3. **Node.js Configuration**
-   - [ ] App root: `/home/username/public_html/Calculate`
+    - [ ] App root: `/home/ultimotr/public_html/repositories/sokogate-calc-deploy`
    - [ ] Startup file: `app.js`
    - [ ] Env vars: `BASE_PATH=/Calculate`, `PORT=3000`, `CORS_ORIGIN=...`
    - [ ] Node version: 18.x or 20.x

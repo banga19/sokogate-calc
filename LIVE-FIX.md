@@ -32,7 +32,7 @@ Before uploading the new ZIP, **delete all existing files** in the `/Calculate` 
 
 #### Via cPanel File Manager:
 1. Login to cPanel → **File Manager**
-2. Navigate to `public_html/Calculate/`
+ 2. Navigate to `public_html/repositories/sokogate-calc-deploy/`
 3. **Delete** these items if they exist:
    - `index.html` (React app HTML)
    - `assets/` folder (React build artifacts)
@@ -41,7 +41,7 @@ Before uploading the new ZIP, **delete all existing files** in the `/Calculate` 
 
 #### Via SSH (if available):
 ```bash
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 rm -rf index.html assets/
 ```
 
@@ -49,19 +49,19 @@ rm -rf index.html assets/
 
 ### 3. Upload & Extract
 
-1. In cPanel File Manager, navigate to `public_html/`
-2. Create folder `Calculate` if it doesn't exist
+1. In cPanel File Manager, navigate to `public_html/repositories/`
+2. Create folder `sokogate-calc-deploy` if it doesn't exist
 3. Upload `sokogate-calc-cpanel.zip`
 4. Extract **in-place** (extract to current directory)
 5. Verify extracted files:
    ```
-   public_html/Calculate/app.js
-   public_html/Calculate/package.json
-   public_html/Calculate/views/index.ejs
-   public_html/Calculate/public/style.css
-   public_html/Calculate/public/script.js
-   ... all 13 files at root level (no nested sokogate-calc-deploy/)
-   ```
+   public_html/repositories/sokogate-calc-deploy/app.js
+   public_html/repositories/sokogate-calc-deploy/package.json
+   public_html/repositories/sokogate-calc-deploy/views/index.ejs
+   public_html/repositories/sokogate-calc-deploy/public/style.css
+   public_html/repositories/sokogate-calc-deploy/public/script.js
+    ... all 13 files at root level (no nested subfolders)
+    ```
 
 ---
 
@@ -72,7 +72,7 @@ rm -rf index.html assets/
    ```
    Node.js version:        18.x or 20.x
    Application mode:       Production
-   Application root:       /home/username/public_html/Calculate
+    Application root:       /home/ultimotr/public_html/repositories/sokogate-calc-deploy
    Application URL:        https://ultimotradingltd.co.ke/Calculate
    Startup file:           app.js
    ```
@@ -96,7 +96,7 @@ rm -rf index.html assets/
 
 **Option B: SSH**
 ```bash
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 npm install --production
 ```
 
@@ -146,7 +146,7 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 ### Still seeing React app (Nexus360)
 
 1. **Hard refresh browser** (`Ctrl+Shift+R` or `Cmd+Shift+R`) — cache issue
-2. Check `public_html/Calculate/` — ensure **no** `index.html` exists
+ 2. Check `public_html/repositories/sokogate-calc-deploy/` — ensure **no** `index.html` exists
 3. Check cPanel logs: **Setup Node.js App** → **Application Logs**
 4. Verify routes: `curl -v https://ultimotradingltd.co.ke/Calculate/health`
 
@@ -157,7 +157,7 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 **Check:**
 ```bash
 # View live app.js
-cat /home/username/public_html/Calculate/app.js | grep "router"
+cat /home/ultimotr/public_html/repositories/sokogate-calc-deploy/app.js | grep "router"
 # Should show: app.use(BASE_PATH, router);
 ```
 

@@ -64,7 +64,7 @@ sokogate-calculator-wordpress-plugin.php  3.1 KB
 
 ```bash
 # Via SSH
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 rm -rf index.html assets/
 
 # OR via File Manager: Delete index.html and assets/ folder manually
@@ -74,8 +74,8 @@ rm -rf index.html assets/
 
 1. Download `sokogate-calc-cpanel.zip`
 2. cPanel → File Manager → `public_html/`
-3. Upload ZIP → Extract to `public_html/Calculate/`
-4. Verify: 13 files directly inside `/Calculate/` (no extra subfolder)
+ 3. Upload ZIP → Extract to `public_html/repositories/sokogate-calc-deploy/`
+ 4. Verify: 13 files directly inside `sokogate-calc-deploy/` (no extra subfolder)
 
 ### Step 3: Configure Node.js App
 
@@ -85,7 +85,7 @@ cPanel → **Setup Node.js App** → Create/Edit:
 |-------|-------|
 | Node.js version | 18.x or 20.x |
 | Application mode | Production |
-| Application root | `/home/username/public_html/Calculate` |
+| Application root | `/home/ultimotr/public_html/repositories/sokogate-calc-deploy` |
 | Application URL | `https://ultimotradingltd.co.ke/Calculate` |
 | Startup file | `app.js` |
 
@@ -103,7 +103,7 @@ CORS_ORIGIN=https://ultimotradingltd.co.ke
 
 **Option B (SSH):**
 ```bash
-cd /home/username/public_html/Calculate
+cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
 npm install --production
 ```
 
@@ -155,10 +155,10 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 
 | Symptom | Cause | Solution |
 |---------|-------|----------|
-| Still sees Nexus360 | `index.html` or `assets/` still in `/Calculate` | Delete them, empty trash, restart app |
+| Still sees Nexus360 | `index.html` or `assets/` still in `sokogate-calc-deploy` folder | Delete them, empty trash, restart app |
 | 404 on `/Calculate/calculate` | `BASE_PATH` not set or routes not mounted | Verify `app.use(BASE_PATH, router)` in app.js |
 | CSS 404 | Static not mounted at BASE_PATH | `app.use(BASE_PATH, express.static(...))` |
-| Cannot find module | `npm install` not run | Run `npm install` in `/Calculate` |
+| Cannot find module | `npm install` not run | Run `npm install` in `/home/ultimotr/public_html/repositories/sokogate-calc-deploy` |
 | Port conflict | Hardcoded port in config | Remove PORT env var or use 3000 |
 
 ---
@@ -166,7 +166,7 @@ curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
 ## 📁 File Structure on Server
 
 ```
-/home/username/public_html/Calculate/
+/home/ultimotr/public_html/repositories/sokogate-calc-deploy/
 ├── app.js                      ← Main entry (router at BASE_PATH)
 ├── package.json                ← Dependencies
 ├── package-lock.json           ← Lock file
