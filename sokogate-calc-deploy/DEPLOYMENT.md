@@ -15,6 +15,9 @@ Your app is already configured for cPanel:
 - ✅ `app.js` listens on `process.env.PORT`
 - ✅ `package.json` has `"start": "node app.js"`
 - ✅ `.npmrc` set to `production` (no devDependencies installed)
+- ✅ `.htaccess` proxy rules are **commented out by default** (safe for Passenger)
+
+> **Note:** The deployment package uses the simplified `app.js` (not `src/server.js`). The `src/` directory is excluded from the ZIP.
 
 ## Step 1: Prepare Files for Upload
 
@@ -62,11 +65,18 @@ public/
    ```
    Node.js version:     18.x or 20.x (recommended)
    Application mode:    Production
-   Application root:    /home/username/sokogate-calc
-   Application URL:     yourdomain.com/sokogate-calc
+   Application root:    /home/username/public_html/Calculate
+   Application URL:     yourdomain.com/Calculate
    Application startup file: app.js
    ```
-4. Click **Create**
+4. Set **Environment Variables**:
+   ```
+   NODE_ENV=production
+   PORT=3000
+   BASE_PATH=/Calculate
+   CORS_ORIGIN=https://yourdomain.com
+   ```
+5. Click **Create**
 
 ## Step 4: Install Dependencies
 
@@ -92,9 +102,15 @@ npm install
 
 Visit these URLs to test:
 ```
-https://yourdomain.com/sokogate-calc          # Calculator page
-https://yourdomain.com/sokogate-calc/health   # Health check (should return JSON)
+https://yourdomain.com/Calculate              # Calculator page
+https://yourdomain.com/Calculate/health       # Health check (should return JSON)
+https://yourdomain.com/Calculate/style.css    # Static assets
 ```
+
+**Expected responses:**
+- `/Calculate` → HTML calculator page (HTTP 200)
+- `/Calculate/health` → `{"status":"ok","timestamp":"..."}` (HTTP 200)
+- `/Calculate/style.css` → CSS content (HTTP 200)
 
 ## Troubleshooting
 
@@ -106,7 +122,9 @@ https://yourdomain.com/sokogate-calc/health   # Health check (should return JSON
 
 ### 404 Errors
 - Check Application URL path matches your folder structure
-- Verify `.htaccess` rules (if using custom routing)
+- Verify the app is running in cPanel (status should show "Running")
+- The `.htaccess` proxy rules are commented out by default for Passenger compatibility
+- If using WordPress iframe integration, uncomment the proxy rule in `.htaccess`
 
 ### Static Files Not Loading (CSS/JS)
 - Check browser console for 404 errors
@@ -115,7 +133,8 @@ https://yourdomain.com/sokogate-calc/health   # Health check (should return JSON
 
 ### Port Already in Use
 - cPanel assigns a port automatically via `process.env.PORT`
-- Do NOT hardcode port numbers in production
+- The app defaults to port 3000 if `PORT` is not set
+- Ensure the `PORT` environment variable in cPanel matches your `.htaccess` proxy rule (if using iframe integration)
 
 ## Useful cPanel Commands (via SSH)
 
@@ -123,17 +142,28 @@ If you have SSH access:
 
 ```bash
 # Navigate to app directory
-cd /home/username/sokogate-calc
+cd /home/username/public_html/Calculate
 
 # Install dependencies
-npm install
+npm ci
 
 # Check app status
-npm start
+node app.js
 
 # View logs
 cat /home/username/logs/passenger.log
 ```
+
+## WordPress iframe Integration
+
+If embedding the calculator in a WordPress page:
+1. Upload the `sokogate-calculator-wordpress-plugin.php` file to WordPress
+2. Activate the plugin
+3. Uncomment the proxy rule in `.htaccess`:
+   ```apache
+   RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+   ```
+4. Ensure the `PORT` environment variable matches the port in `.htaccess`
 
 ## Post-Deployment
 
@@ -152,4 +182,5 @@ If you encounter issues:
 
 ---
 **Deployed Version:** 1.0.0  
-**Last Updated:** 2026
+**Last Updated:** 2026-04-27  
+**ZIP Size:** ~36KB (13 files, flat structure)

@@ -30,19 +30,28 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static assets at BASE_PATH (e.g., /Calculate/style.css)
+app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
+
+// Create router for calculator routes
+const router = express.Router();
+
+// Health check
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Serve calculator page
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
-app.get('/calculate', (req, res) => {
+router.get('/calculate', (req, res) => {
   res.render('index', { result: null, query: req.query });
 });
 
 // Handle form submission
-app.post('/calculate', (req, res) => {
+router.post('/calculate', (req, res) => {
   const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
   let result = {};
   const areaNum = parseFloat(area);
@@ -149,12 +158,8 @@ app.post('/calculate', (req, res) => {
   }
 });
 
-
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// Mount router at BASE_PATH
+app.use(BASE_PATH, router);
 
 // Error handling
 app.use((err, req, res, next) => {
