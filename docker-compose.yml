@@ -2,25 +2,42 @@ version: '3.8'
 
 services:
   sokogate-calculator:
-    build: .
+    build:
+      context: .
+      target: runtime
+      dockerfile: Dockerfile
+      cache_from:
+        - sokogate-calculator:latest
+    image: sokogate-calculator:latest
+    container_name: sokogate-calculator
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - BASE_PATH=/Calculate
-      - CORS_ORIGIN=https://ultimotradingltd.co.ke
-      - LOG_LEVEL=info
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      BASE_PATH: ${BASE_PATH:-/Calculate}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://ultimotradingltd.co.ke}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
+    env_file:
+      - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/Calculate/health"]
+      test: ["CMD", "node", "healthcheck.js"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 10s
     networks:
-      - app-network
+      - sokogate-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
-  app-network:
+  sokogate-network:
     driver: bridge
+    name: sokogate-network
