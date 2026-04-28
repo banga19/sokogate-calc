@@ -7,3 +7,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .DS_Store
+
+# cPanel / Passenger / Apache
+tmp/
+*.pid
+passenger_wsgi.py
+cgi-bin/
+error_log

@@ -142,6 +142,35 @@ Services are instantiated in controllers, making them easily testable and mockab
 
 This project is licensed under the MIT License.
 
+## 🆘 Troubleshooting
+
+### Git Pull Error: "Directory not empty"
+
+If you see this error in **cPanel → Git Version Control**:
+```
+FileOp Failure on: /home2/ultimotr/repositories/sokogate-calc: Directory not empty
+```
+
+This happens when untracked files (like `node_modules/`, `logs/`, or `.env`) exist in the Git repository folder on the server, blocking the pull operation.
+
+**Quick Fix:**
+1. See **[CPANEL-GIT-FIX.md](CPANEL-GIT-FIX.md)** for detailed step-by-step instructions
+2. Or use **cPanel → File Manager** to delete untracked files from `repositories/sokogate-calc/`
+3. Then retry **"Update from Remote"** in Git Version Control
+
+**Prevention:**
+- The `.gitignore` file now includes cPanel-specific exclusions (`tmp/`, `*.pid`, `passenger_wsgi.py`)
+- Never run `npm install` inside the Git repo folder on cPanel — use the deployment target folder instead
+
+### Common Deployment Issues
+
+| Issue | Solution |
+|-------|----------|
+| 404 errors | Check `BASE_PATH` environment variable matches your URL path |
+| CSS/JS not loading | Verify `public/` folder was uploaded and static files are served |
+| App won't start | Check cPanel Node.js logs and ensure `npm install` ran successfully |
+| Old React app showing | Delete `index.html` and `assets/` from deployment folder |
+
 ## 🆘 Support
 
-For issues with the calculator functionality, check the health endpoint and logs. For deployment issues, refer to the WordPress integration guide.
+For issues with the calculator functionality, check the health endpoint and logs. For deployment issues, refer to the **[CPANEL-GIT-FIX.md](CPANEL-GIT-FIX.md)** guide or the WordPress integration guide.
