@@ -62,9 +62,7 @@ All files in `sokogate-calc-deploy/` match the working local version:
 
 ---
 
-## Next Steps: Deploy to cPanel
 
-### Quick Deploy (3 minutes)
 
 1. **Download ZIP** from:
    ```

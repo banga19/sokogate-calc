@@ -12,7 +12,6 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- Header -->
     <header class="site-header">
       <div class="container">
         <a href="<%= basePath %>" class="brand" aria-label="Sokogate Home">
@@ -33,7 +32,6 @@
       </div>
     </header>
 
-    <!-- Hero -->
     <section class="hero">
       <div class="container">
         <h1>Construction Materials Calculator</h1>
@@ -49,10 +47,8 @@
       </div>
     </section>
 
-    <!-- Main Content -->
     <main class="container">
       <div class="main-grid">
-        <!-- Calculator Card -->
         <div class="card">
           <div class="card-header">
             <div class="card-header-icon accent" aria-hidden="true">
@@ -68,7 +64,6 @@
           </div>
           <div class="card-body">
             <form action="<%= basePath %>/calculate" method="POST" id="calcForm" novalidate>
-              <!-- Area Input -->
               <div class="form-group">
                 <label for="area" class="form-label">
                   <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,18 +73,7 @@
                   Area
                   <span class="label-hint">sq ft</span>
                 </label>
-                <input 
-                  type="number" 
-                  id="area" 
-                  name="area" 
-                  class="form-input" 
-                  required 
-                  min="1" 
-                  step="0.01" 
-                  placeholder="e.g. 500"
-                  autocomplete="off"
-                  aria-describedby="areaHint"
-                >
+                <input type="number" id="area" name="area" class="form-input" required min="1" step="0.01" placeholder="e.g. 500" autocomplete="off" aria-describedby="areaHint">
                 <div class="form-hint" id="areaHint">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
@@ -99,7 +83,6 @@
                 </div>
               </div>
 
-              <!-- Room Dimensions -->
               <div class="form-group">
                 <div class="form-label">
                   <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -129,7 +112,6 @@
                 </div>
               </div>
 
-              <!-- Material Type -->
               <div class="form-group">
                 <label for="materialType" class="form-label">
                   <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -161,7 +143,6 @@
                 </select>
               </div>
 
-              <!-- Thickness Field (shown for concrete/steel) -->
               <div class="form-group" id="thicknessGroup" style="display: none;">
                 <label for="thickness" class="form-label">
                   <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -171,17 +152,7 @@
                   Thickness
                   <span class="label-hint">inches</span>
                 </label>
-                <input 
-                  type="number" 
-                  id="thickness" 
-                  name="thickness" 
-                  class="form-input" 
-                  min="1" 
-                  max="24" 
-                  step="0.5" 
-                  value="4"
-                  placeholder="e.g. 4 inches"
-                >
+                <input type="number" id="thickness" name="thickness" class="form-input" min="1" max="24" step="0.5" value="4" placeholder="e.g. 4 inches">
                 <div class="form-hint">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
@@ -191,7 +162,6 @@
                 </div>
               </div>
 
-              <!-- Tile Size Field (shown for tiles) -->
               <div class="form-group" id="tileSizeGroup" style="display: none;">
                 <label for="tileSize" class="form-label">
                   <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -228,7 +198,6 @@
           </div>
         </div>
         
-        <!-- Results Column -->
         <div class="results-column">
           <% if (typeof result !== 'undefined' && result) { %>
             <% if (result.error) { %>
@@ -275,120 +244,25 @@
                   <div class="result-summary">
                     <span class="material-type-badge"><%= result.materialType || 'Materials' %></span>
                   </div>
-                  <% if (result.cement) { %>
-                    <div class="result-item">
-                      <span class="label">Cement</span>
-                      <span class="value"><%= result.cement %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.sand) { %>
-                    <div class="result-item">
-                      <span class="label">Sand</span>
-                      <span class="value"><%= result.sand %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.aggregate) { %>
-                    <div class="result-item">
-                      <span class="label">Aggregate</span>
-                      <span class="value"><%= result.aggregate %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.bricks) { %>
-                    <div class="result-item">
-                      <span class="label">Bricks</span>
-                      <span class="value"><%= result.bricks %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.concrete) { %>
-                    <div class="result-item">
-                      <span class="label">Concrete</span>
-                      <span class="value"><%= result.concrete %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.paint) { %>
-                    <div class="result-item">
-                      <span class="label">Paint</span>
-                      <span class="value"><%= result.paint %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.primer) { %>
-                    <div class="result-item">
-                      <span class="label">Primer</span>
-                      <span class="value"><%= result.primer %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.tiles) { %>
-                    <div class="result-item">
-                      <span class="label">Tiles</span>
-                      <span class="value"><%= result.tiles %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.tileArea) { %>
-                    <div class="result-item">
-                      <span class="label">Tile Area</span>
-                      <span class="value"><%= result.tileArea %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.adhesive) { %>
-                    <div class="result-item">
-                      <span class="label">Adhesive</span>
-                      <span class="value"><%= result.adhesive %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.grout) { %>
-                    <div class="result-item">
-                      <span class="label">Grout</span>
-                      <span class="value"><%= result.grout %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.steel) { %>
-                    <div class="result-item">
-                      <span class="label">Steel</span>
-                      <span class="value"><%= result.steel %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.wireMesh) { %>
-                    <div class="result-item">
-                      <span class="label">Wire Mesh</span>
-                      <span class="value"><%= result.wireMesh %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.blocks) { %>
-                    <div class="result-item">
-                      <span class="label">Blocks</span>
-                      <span class="value"><%= result.blocks %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.gravel) { %>
-                    <div class="result-item">
-                      <span class="label">Gravel</span>
-                      <span class="value"><%= result.gravel %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.geotextile) { %>
-                    <div class="result-item">
-                      <span class="label">Geotextile</span>
-                      <span class="value"><%= result.geotextile %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.roofingSheets) { %>
-                    <div class="result-item">
-                      <span class="label">Roofing Sheets</span>
-                      <span class="value"><%= result.roofingSheets %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.screws) { %>
-                    <div class="result-item">
-                      <span class="label">Screws</span>
-                      <span class="value"><%= result.screws %></span>
-                    </div>
-                  <% } %>
-                  <% if (result.flashing) { %>
-                    <div class="result-item">
-                      <span class="label">Flashing</span>
-                      <span class="value"><%= result.flashing %></span>
-                    </div>
-                  <% } %>
+                  <% if (result.cement) { %><div class="result-item"><span class="label">Cement</span><span class="value"><%= result.cement %></span></div><% } %>
+                  <% if (result.sand) { %><div class="result-item"><span class="label">Sand</span><span class="value"><%= result.sand %></span></div><% } %>
+                  <% if (result.aggregate) { %><div class="result-item"><span class="label">Aggregate</span><span class="value"><%= result.aggregate %></span></div><% } %>
+                  <% if (result.bricks) { %><div class="result-item"><span class="label">Bricks</span><span class="value"><%= result.bricks %></span></div><% } %>
+                  <% if (result.concrete) { %><div class="result-item"><span class="label">Concrete</span><span class="value"><%= result.concrete %></span></div><% } %>
+                  <% if (result.paint) { %><div class="result-item"><span class="label">Paint</span><span class="value"><%= result.paint %></span></div><% } %>
+                  <% if (result.primer) { %><div class="result-item"><span class="label">Primer</span><span class="value"><%= result.primer %></span></div><% } %>
+                  <% if (result.tiles) { %><div class="result-item"><span class="label">Tiles</span><span class="value"><%= result.tiles %></span></div><% } %>
+                  <% if (result.tileArea) { %><div class="result-item"><span class="label">Tile Area</span><span class="value"><%= result.tileArea %></span></div><% } %>
+                  <% if (result.adhesive) { %><div class="result-item"><span class="label">Adhesive</span><span class="value"><%= result.adhesive %></span></div><% } %>
+                  <% if (result.grout) { %><div class="result-item"><span class="label">Grout</span><span class="value"><%= result.grout %></span></div><% } %>
+                  <% if (result.steel) { %><div class="result-item"><span class="label">Steel</span><span class="value"><%= result.steel %></span></div><% } %>
+                  <% if (result.wireMesh) { %><div class="result-item"><span class="label">Wire Mesh</span><span class="value"><%= result.wireMesh %></span></div><% } %>
+                  <% if (result.blocks) { %><div class="result-item"><span class="label">Blocks</span><span class="value"><%= result.blocks %></span></div><% } %>
+                  <% if (result.gravel) { %><div class="result-item"><span class="label">Gravel</span><span class="value"><%= result.gravel %></span></div><% } %>
+                  <% if (result.geotextile) { %><div class="result-item"><span class="label">Geotextile</span><span class="value"><%= result.geotextile %></span></div><% } %>
+                  <% if (result.roofingSheets) { %><div class="result-item"><span class="label">Roofing Sheets</span><span class="value"><%= result.roofingSheets %></span></div><% } %>
+                  <% if (result.screws) { %><div class="result-item"><span class="label">Screws</span><span class="value"><%= result.screws %></span></div><% } %>
+                  <% if (result.flashing) { %><div class="result-item"><span class="label">Flashing</span><span class="value"><%= result.flashing %></span></div><% } %>
                 </div>
               </div>
             <% } %>
@@ -415,26 +289,18 @@
           <% } %>
         </div>
       </div>
-      
-
     </main>
-
-    <!-- Debug: Show result object if ?debug=1 -->
-    <% if (typeof result !== 'undefined' && result && typeof query !== 'undefined' && query.debug) { %>
-      <div style="background:#f00;color:#fff;padding:10px;margin-top:20px;font-family:monospace;font-size:12px;">
-        <strong>DEBUG:</strong> <pre><%= JSON.stringify(result, null, 2) %></pre>
-      </div>
-    <% } %>
   </div>
 
   <script>
     window.APP_BASE_PATH = "<%= basePath %>";
+    window.APP_VERSION   = "1.0.3-prod";
   </script>
 
   <script>
     const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
   </script>
-  <script src="<%= basePath %>/script.js"></script>
+  <script src="<%= basePath %>/script.js?v=1.0.3"></script>
 </body>
 </html>
 
