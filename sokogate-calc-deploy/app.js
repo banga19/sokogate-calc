@@ -4,14 +4,21 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const DEFAULT_PORT = 3001;
 const DEFAULT_BASE_PATH = '/repositories/sokogate-calc3/sokogate-calc-deploy';
+
+function normalizePort(value) {
+  const port = Number.parseInt(value, 10);
+  return Number.isInteger(port) && port > 0 && port <= 65535 ? port : DEFAULT_PORT;
+}
 
 function normalizeBasePath(value) {
   const trimmed = String(value || DEFAULT_BASE_PATH).trim();
   const withLeadingSlash = trimmed.startsWith('/') ? trimmed : '/' + trimmed;
   return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : withLeadingSlash;
 }
+
+const PORT = normalizePort(process.env.APP_PORT || process.env.PORT);
 
 /* ═══════════════════════════════════════════════════════════════
    BASE_PATH  —  MUST MATCH the URL path on the live server.
@@ -328,10 +335,10 @@ if (require.main === module) {
     if (err.code === 'EADDRINUSE') {
       console.error(`\n❌ Error: Port ${PORT} is already in use!\n`);
       console.error('Solutions:');
-      console.error(`   1. Use a different free port: PORT=3001 npm start`);
+      console.error('   1. In cPanel Environment Variables, remove PORT=3000 or set APP_PORT to a free port such as 3001');
       console.error(`   2. Kill the process using port ${PORT}:`);
       console.error(`      lsof -ti:${PORT} | xargs kill -9`);
-      console.error('   3. For cPanel: remove any manual PORT=3000 env var, use cPanel\'s assigned port, then restart the app');
+      console.error('   3. Restart the app from cPanel "Setup Node.js App" after changing the port');
       console.error('\n');
       process.exit(1);
     } else {

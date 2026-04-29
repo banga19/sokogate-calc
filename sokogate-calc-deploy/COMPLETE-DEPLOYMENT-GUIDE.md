@@ -65,7 +65,7 @@ npm test
 npm run dev
 
 # Or with custom environment
-BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy PORT=3001 NODE_ENV=production node app.js
+BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy APP_PORT=3001 NODE_ENV=production node app.js
 ```
 
 ### Test Endpoints
@@ -126,7 +126,7 @@ The Dockerfile uses a multi-stage build:
    - Excludes dev dependencies, tests, docs, git history
    - Sets non-root user `appuser` (UID 1001)
    - Configures healthcheck
-   - Exposes port 3000
+   - Exposes port 3001
 
 **Image Size:** ~150-200MB (vs ~500MB for single-stage)
 
@@ -248,7 +248,7 @@ In the Node.js App settings, click **"Edit"** and add environment variables:
 | Variable | Value | Required |
 |----------|-------|----------|
 | `NODE_ENV` | `production` | Yes |
-| `PORT` | `3000` | Yes |
+| `APP_PORT` | `3001` | Recommended |
 | `BASE_PATH` | `/repositories/sokogate-calc3/sokogate-calc-deploy` | Yes |
 | `CORS_ORIGIN` | `https://ultimotradingltd.co.ke` | Yes |
 | `LOG_LEVEL` | `info` | No |
@@ -289,7 +289,7 @@ npm ci --only=production
 
 cPanel's Node.js integration uses Phusion Passenger, which automatically handles:
 - Reverse proxying from Apache/Nginx to Node.js
-- Port allocation via `process.env.PORT`
+- Port allocation via `process.env.APP_PORT || process.env.PORT`
 - Process management and restarts
 
 **No manual proxy configuration needed if using cPanel's Node.js selector.**
@@ -304,7 +304,7 @@ RewriteEngine On
 
 # Proxy requests to Node.js app (running on assigned port)
 RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc3/sokogate-calc-deploy
-RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+RewriteRule ^(.*)$ http://127.0.0.1:3001/$1 [P,L]
 
 # Optional: Handle WordPress conflicts
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -320,7 +320,7 @@ If embedding calculator in WordPress:
 1. Install the WordPress plugin: `sokogate-calculator-wordpress-plugin.php`
 2. Activate plugin in WordPress admin
 3. Uncomment proxy rule in `.htaccess`
-4. Ensure `PORT` matches between `.htaccess` and cPanel environment
+4. Ensure `APP_PORT` matches between `.htaccess` and cPanel environment
 
 ---
 
@@ -330,7 +330,7 @@ If embedding calculator in WordPress:
 
 ```bash
 NODE_ENV=production
-PORT=3001                    # Assigned by cPanel, verify in app settings
+APP_PORT=3001                # Use this when PORT=3000 is already in use
 BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy         # Must match Application URL path
 CORS_ORIGIN=https://ultimotradingltd.co.ke
 ```
@@ -508,7 +508,7 @@ Check:
 2. Application root path is correct
 3. Startup file is `app.js` (not server.js or index.js)
 4. Dependencies installed (check via "Run NPM Install")
-5. Environment variables set (especially PORT and BASE_PATH)
+5. Environment variables set (especially APP_PORT and BASE_PATH)
 6. Error logs in cPanel → "Node.js Logs"
 ```
 
@@ -547,7 +547,7 @@ Solutions:
 **Issue: Port already in use**
 ```
 On cPanel: Restart the app via "Setup Node.js App" panel
-Locally: lsof -ti:3000 | xargs kill -9
+Locally: lsof -ti:3001 | xargs kill -9
 ```
 
 ### 9.2 Docker Issues
@@ -720,7 +720,7 @@ tar -czf sokogate-calc-backup-$(date +%Y%m%d).tar.gz \
 ### 12.1 Firewall Rules
 
 Ensure cPanel firewall (CSF) allows:
-- Port 3000 (for internal Passenger proxy)
+- Port 3001, or the free port assigned in cPanel
 - Port 2083 (cPanel)
 - Port 2087 (cPanel SSHDH)
 - Port 80, 443 (web)
@@ -786,7 +786,7 @@ docker run -d -p 3001:3001 --name sokogate-calc \
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `NODE_ENV` | `production` | Yes | Node environment |
-| `PORT` | `3000` | Yes | Internal port (cPanel assigns) |
+| `APP_PORT` | `3001` | Recommended | Overrides a busy `PORT=3000` |
 | `BASE_PATH` | `/repositories/sokogate-calc3/sokogate-calc-deploy` | Yes | URL mount path |
 | `CORS_ORIGIN` | `*` | Recommended | Allowed CORS origin |
 | `LOG_LEVEL` | `info` | No | Logging verbosity |

@@ -13,10 +13,11 @@
 3. Set environment variables:
    ```
    NODE_ENV=production
+   APP_PORT=3001
    BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy
    CORS_ORIGIN=https://ultimotradingltd.co.ke
    ```
-   Do not set `PORT=3000` manually unless cPanel specifically assigns that port. If cPanel exposes a Port/Application Port field, use a free assigned port and keep the app restarted from the Node.js App panel.
+   If `PORT=3000` already exists in cPanel and gives "already in use", delete that variable or leave it alone and set `APP_PORT=3001`. The app gives `APP_PORT` priority over `PORT`.
 
 4. Click "Create", then "Run NPM Install", then "Restart"
 
