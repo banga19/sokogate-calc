@@ -9,7 +9,7 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /repositories/sokogate-calc-deploy/
+    RewriteBase /repositories/Sokogate-calc-deploy/
 
     # --- 1. Explicitly deny old React build artifacts (410 Gone) ---
     RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc-deploy/assets/ [NC,OR]
@@ -58,4 +58,3 @@
 </FilesMatch>
 
 AddDefaultCharset UTF-8
-
