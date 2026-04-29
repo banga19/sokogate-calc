@@ -56,7 +56,7 @@ npm ci --only=production
 ### Run Health Check
 ```bash
 npm test
-# Expected output: {"status":"ok","basePath":"/Calculate","env":"production","timestamp":"..."}
+# Expected output: {"status":"ok","basePath":"/repositories/sokogate-calc3/sokogate-calc-deploy","env":"production","timestamp":"..."}
 ```
 
 ### Start Development Server
@@ -65,29 +65,29 @@ npm test
 npm run dev
 
 # Or with custom environment
-BASE_PATH=/Calculate PORT=3000 NODE_ENV=production node app.js
+BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy PORT=3001 NODE_ENV=production node app.js
 ```
 
 ### Test Endpoints
 ```bash
 # Health endpoint
-curl http://localhost:3000/Calculate/health
+curl http://localhost:3001/repositories/sokogate-calc3/sokogate-calc-deploy/health
 
 # Main page
-curl http://localhost:3000/Calculate
+curl http://localhost:3001/repositories/sokogate-calc3/sokogate-calc-deploy
 
 # Static CSS
-curl http://localhost:3000/Calculate/style.css -I
+curl http://localhost:3001/repositories/sokogate-calc3/sokogate-calc-deploy/style.css -I
 
 # Test calculation
-curl -X POST http://localhost:3000/Calculate/calculate \
+curl -X POST http://localhost:3001/repositories/sokogate-calc3/sokogate-calc-deploy/calculate \
   -d "area=100&materialType=cement"
 ```
 
 **Expected Results:**
-- `/Calculate/health`: `200 OK` with JSON status
-- `/Calculate`: `200 OK` with HTML page
-- `/Calculate/style.css`: `200 OK` with CSS content
+- `/repositories/sokogate-calc3/sokogate-calc-deploy/health`: `200 OK` with JSON status
+- `/repositories/sokogate-calc3/sokogate-calc-deploy`: `200 OK` with HTML page
+- `/repositories/sokogate-calc3/sokogate-calc-deploy/style.css`: `200 OK` with CSS content
 - POST to `/calculate`: Returns EJS-rendered page with results
 
 ---
@@ -220,9 +220,9 @@ sokogate-calc-deploy/   # Redundant copy
 5. Set permissions:
    ```bash
    # Via SSH or File Manager
-   chmod 755 /home/ultimotr/public_html/repositories/sokogate-calc-deploy
-   chmod 644 /home/ultimotr/public_html/repositories/sokogate-calc-deploy/*.js
-   chmod 644 /home/ultimotr/public_html/repositories/sokogate-calc-deploy/*.json
+   chmod 755 /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy
+   chmod 644 /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy/*.js
+   chmod 644 /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy/*.json
    ```
 
 ### 4.3 Setup Node.js App in cPanel
@@ -235,8 +235,8 @@ sokogate-calc-deploy/   # Redundant copy
 |-------|-------|
 | Node.js version | 18.x or 20.x |
 | Application mode | Production |
-| Application root | `/home/ultimotr/public_html/repositories/sokogate-calc-deploy` |
-| Application URL | `https://ultimotradingltd.co.ke/Calculate` |
+| Application root | `/home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy` |
+| Application URL | `https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy` |
 | Application startup file | `app.js` |
 
 4. Click **Create**
@@ -249,7 +249,7 @@ In the Node.js App settings, click **"Edit"** and add environment variables:
 |----------|-------|----------|
 | `NODE_ENV` | `production` | Yes |
 | `PORT` | `3000` | Yes |
-| `BASE_PATH` | `/Calculate` | Yes |
+| `BASE_PATH` | `/repositories/sokogate-calc3/sokogate-calc-deploy` | Yes |
 | `CORS_ORIGIN` | `https://ultimotradingltd.co.ke` | Yes |
 | `LOG_LEVEL` | `info` | No |
 | `RATE_LIMIT_WINDOW_MS` | `900000` (15 min) | No |
@@ -266,7 +266,7 @@ In the Node.js App settings, click **"Edit"** and add environment variables:
 
 **Method B: SSH (if available)**
 ```bash
-cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
+cd /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy
 npm ci --only=production
 ```
 
@@ -303,7 +303,7 @@ If you need custom reverse proxy rules (e.g., WordPress integration), edit `.hta
 RewriteEngine On
 
 # Proxy requests to Node.js app (running on assigned port)
-RewriteCond %{REQUEST_URI} ^/Calculate
+RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc3/sokogate-calc-deploy
 RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
 
 # Optional: Handle WordPress conflicts
@@ -330,8 +330,8 @@ If embedding calculator in WordPress:
 
 ```bash
 NODE_ENV=production
-PORT=3000                    # Assigned by cPanel, verify in app settings
-BASE_PATH=/Calculate         # Must match Application URL path
+PORT=3001                    # Assigned by cPanel, verify in app settings
+BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy         # Must match Application URL path
 CORS_ORIGIN=https://ultimotradingltd.co.ke
 ```
 
@@ -354,8 +354,8 @@ NODE_TLS_REJECT_UNAUTHORIZED=0  # Only if using self-signed certs (not recommend
 Create `.env` file in project root:
 ```bash
 NODE_ENV=production
-APP_PORT=3000
-BASE_PATH=/Calculate
+APP_PORT=3001
+BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy
 CORS_ORIGIN=https://ultimotradingltd.co.ke
 ```
 
@@ -367,14 +367,14 @@ CORS_ORIGIN=https://ultimotradingltd.co.ke
 
 ```bash
 # Test main page
-curl -I https://ultimotradingltd.co.ke/Calculate
+curl -I https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy
 
 # Test health endpoint
-curl https://ultimotradingltd.co.ke/Calculate/health
+curl https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/health
 
 # Test static assets
-curl -I https://ultimotradingltd.co.ke/Calculate/style.css
-curl -I https://ultimotradingltd.co.ke/Calculate/script.js
+curl -I https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/style.css
+curl -I https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/script.js
 ```
 
 **Expected:**
@@ -387,16 +387,16 @@ curl -I https://ultimotradingltd.co.ke/Calculate/script.js
 
 ```bash
 # Test cement calculation
-curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
+curl -X POST https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/calculate \
   -d "area=500&materialType=cement" \
   -c cookies.txt -b cookies.txt
 
 # Test brick calculation
-curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
+curl -X POST https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/calculate \
   -d "area=200&materialType=bricks&thickness=4"
 
 # Test tile calculation
-curl -X POST https://ultimotradingltd.co.ke/Calculate/calculate \
+curl -X POST https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy/calculate \
   -d "area=150&materialType=tiles&tileSize=12"
 ```
 
@@ -406,7 +406,7 @@ Verify responses contain expected material quantities (e.g., cement bags, brick 
 
 ```bash
 # Verify SSL is active
-curl -I https://ultimotradingltd.co.ke/Calculate
+curl -I https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy
 
 # Check certificate details
 echo | openssl s_client -connect ultimotradingltd.co.ke:443 2>/dev/null | openssl x509 -noout -dates -subject
@@ -487,9 +487,9 @@ docker pull registry.example.com/sokogate-calculator:1.0.0
 # Run container
 docker run -d \
   --name sokogate-calc \
-  -p 3000:3000 \
+  -p 3001:3001 \
   -e NODE_ENV=production \
-  -e BASE_PATH=/Calculate \
+  -e BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy \
   -e CORS_ORIGIN=https://ultimotradingltd.co.ke \
   --restart unless-stopped \
   registry.example.com/sokogate-calculator:1.0.0
@@ -512,7 +512,7 @@ Check:
 6. Error logs in cPanel → "Node.js Logs"
 ```
 
-**Issue: 404 on /Calculate routes**
+**Issue: 404 on /repositories/sokogate-calc3/sokogate-calc-deploy routes**
 ```
 Causes:
 - BASE_PATH mismatch between cPanel URL and env variable
@@ -520,8 +520,8 @@ Causes:
 - .htaccess rules interfering
 
 Fix:
-1. Ensure Application URL = https://ultimotradingltd.co.ke/Calculate
-2. Set BASE_PATH=/Calculate in env
+1. Ensure Application URL = https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy
+2. Set BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy in env
 3. Comment out proxy rules in .htaccess for Passenger
 4. Restart app
 ```
@@ -590,7 +590,7 @@ docker run --rm sokogate-calculator:latest ls -la /app
 **EJS template errors:**
 ```bash
 # Check syntax
-node -e "require('ejs').renderFile('views/index.ejs', {basePath:'/Calculate', result:null})"
+node -e "require('ejs').renderFile('views/index.ejs', {basePath:'/repositories/sokogate-calc3/sokogate-calc-deploy', result:null})"
 ```
 
 **Environment variables not loading:**
@@ -624,7 +624,7 @@ tail -f /home/ultimotr/logs/passenger.log
    ```bash
    # Via File Manager, restore from backup
    # Or use Git to checkout previous commit
-   cd /home/ultimotr/public_html/repositories/sokogate-calc-deploy
+   cd /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy
    git checkout <previous-commit-hash>
    ```
 
@@ -651,7 +651,7 @@ docker rm sokogate-calculator
 # Run previous version
 docker run -d \
   --name sokogate-calculator \
-  -p 3000:3000 \
+  -p 3001:3001 \
   -e NODE_ENV=production \
   sokogate-calculator:1.0.1  # previous tag
 ```
@@ -663,7 +663,7 @@ docker run -d \
 ### 11.1 Log Management
 
 **cPanel logs:**
-- Access logs: `/home/ultimotr/public_html/repositories/sokogate-calc-deploy/logs/`
+- Access logs: `/home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy/logs/`
 - Node.js logs: cPanel → **Node.js Logs**
 - Apache/Nginx logs: cPanel → **Metrics** → **Errors**
 
@@ -680,11 +680,11 @@ docker ps --filter "name=sokogate"
 
 ### 11.2 Health Monitoring
 
-The `/Calculate/health` endpoint returns:
+The `/repositories/sokogate-calc3/sokogate-calc-deploy/health` endpoint returns:
 ```json
 {
   "status": "ok",
-  "basePath": "/Calculate",
+  "basePath": "/repositories/sokogate-calc3/sokogate-calc-deploy",
   "env": "production",
   "timestamp": "2026-04-28T14:55:47.066Z"
 }
@@ -700,7 +700,7 @@ The `/Calculate/health` endpoint returns:
 **Daily backups of application code:**
 ```bash
 tar -czf sokogate-calc-backup-$(date +%Y%m%d).tar.gz \
-  /home/ultimotr/public_html/repositories/sokogate-calc-deploy/
+  /home/ultimotr/public_html/repositories/sokogate-calc3/sokogate-calc-deploy/
 
 # Download via SFTP/FTP
 ```
@@ -759,7 +759,7 @@ All form inputs validated server-side in `app.js`:
 docker build -t sokogate-calculator:1.0.0 .
 
 # 2. Test locally
-docker run -p 3000:3000 -e BASE_PATH=/Calculate sokogate-calculator:1.0.0
+docker run -p 3001:3001 -e BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy sokogate-calculator:1.0.0
 
 # 3. Tag for registry
 docker tag sokogate-calculator:1.0.0 docker.io/username/sokogate-calc:1.0.0
@@ -772,8 +772,8 @@ ssh user@ultimotradingltd.co.ke
 
 # 6. Pull and run on server
 docker pull docker.io/username/sokogate-calc:1.0.0
-docker run -d -p 3000:3000 --name sokogate-calc \
-  -e BASE_PATH=/Calculate \
+docker run -d -p 3001:3001 --name sokogate-calc \
+  -e BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy \
   -e CORS_ORIGIN=https://ultimotradingltd.co.ke \
   --restart unless-stopped \
   docker.io/username/sokogate-calc:1.0.0
@@ -787,7 +787,7 @@ docker run -d -p 3000:3000 --name sokogate-calc \
 |----------|---------|----------|-------------|
 | `NODE_ENV` | `production` | Yes | Node environment |
 | `PORT` | `3000` | Yes | Internal port (cPanel assigns) |
-| `BASE_PATH` | `/Calculate` | Yes | URL mount path |
+| `BASE_PATH` | `/repositories/sokogate-calc3/sokogate-calc-deploy` | Yes | URL mount path |
 | `CORS_ORIGIN` | `*` | Recommended | Allowed CORS origin |
 | `LOG_LEVEL` | `info` | No | Logging verbosity |
 | `RATE_LIMIT_WINDOW_MS` | `900000` | No | Rate limit window (ms) |
@@ -843,7 +843,7 @@ sokogate-calc/
 - [ ] cPanel Node.js support confirmed
 
 ### During Deployment
-- [ ] Files uploaded to correct directory (`public_html/repositories/sokogate-calc-deploy/`)
+- [ ] Files uploaded to correct directory (`public_html/repositories/sokogate-calc3/sokogate-calc-deploy/`)
 - [ ] Application root set correctly in cPanel
 - [ ] Startup file = `app.js`
 - [ ] All environment variables configured
@@ -851,7 +851,7 @@ sokogate-calc/
 - [ ] Application status = "Running"
 
 ### After Deployment
-- [ ] Health endpoint responds (`/Calculate/health`)
+- [ ] Health endpoint responds (`/repositories/sokogate-calc3/sokogate-calc-deploy/health`)
 - [ ] Main page loads without errors
 - [ ] Calculator works for all material types
 - [ ] Static assets (CSS/JS) load correctly
@@ -874,4 +874,4 @@ For issues specific to:
 
 **Last Updated:** 2026-04-28  
 **Application Version:** 1.0.0  
-**Deployment Target:** https://ultimotradingltd.co.ke/Calculate
+**Deployment Target:** https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy

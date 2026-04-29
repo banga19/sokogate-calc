@@ -1,9 +1,17 @@
 const http = require('http');
 
+const DEFAULT_BASE_PATH = '/repositories/sokogate-calc3/sokogate-calc-deploy';
+
+function normalizeBasePath(value) {
+  const trimmed = String(value || DEFAULT_BASE_PATH).trim();
+  const withLeadingSlash = trimmed.startsWith('/') ? trimmed : '/' + trimmed;
+  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : withLeadingSlash;
+}
+
 const options = {
   hostname: 'localhost',
-  port: process.env.PORT || 3000,
-  path: (process.env.BASE_PATH || '/sokogate-calc/sokogate-calc-deploy') + '/health',
+  port: process.env.PORT || 3001,
+  path: normalizeBasePath(process.env.BASE_PATH) + '/health',
   method: 'GET',
   timeout: 5000
 };

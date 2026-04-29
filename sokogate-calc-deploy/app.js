@@ -5,22 +5,29 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const DEFAULT_BASE_PATH = '/repositories/sokogate-calc3/sokogate-calc-deploy';
+
+function normalizeBasePath(value) {
+  const trimmed = String(value || DEFAULT_BASE_PATH).trim();
+  const withLeadingSlash = trimmed.startsWith('/') ? trimmed : '/' + trimmed;
+  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : withLeadingSlash;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    BASE_PATH  —  MUST MATCH the URL path on the live server.
    In cPanel, if the app is accessed at:
-       https://ultimotradingltd.co.ke/sokogate-calc/sokogate-calc-deploy
+       https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy
    then set this in the env panel:
-       BASE_PATH=/sokogate-calc/sokogate-calc-deploy
+       BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy
    ═══════════════════════════════════════════════════════════════ */
-const BASE_PATH = process.env.BASE_PATH || '/sokogate-calc/sokogate-calc-deploy';
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 /* ─── Logging ────────────────────────────────────────────────── */
 app.use((req, res, next) => {
   if (!isProduction || req.url !== '/health') {
-    console.log(`${new Date().toISOString()} - ${req.method} ${BASE_PATH}${req.url}`);
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
   }
   next();
 });
@@ -35,6 +42,22 @@ app.use(cors({
   credentials: true
 }));
 
+/* ─── Keep cPanel availability checks stable for rendered HTML ─ */
+app.use((req, res, next) => {
+  const writeHead = res.writeHead;
+
+  res.writeHead = function writeHeadWithoutHtmlCharset(...args) {
+    const contentType = res.getHeader('Content-Type');
+    if (typeof contentType === 'string' && /^text\/html\b/i.test(contentType)) {
+      res.setHeader('Content-Type', 'text/html');
+    }
+
+    return writeHead.apply(this, args);
+  };
+
+  next();
+});
+
 /* ─── Injects basePath into every template / response ────────── */
 app.use((req, res, next) => {
   res.locals.basePath = BASE_PATH;
@@ -46,7 +69,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 /* ─── Static assets (served directly via BASE_PATH) ──────────── */
-app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
+app.use(BASE_PATH, express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 /* ═══════════════════════════════════════════════════════════════
    ROUTER  —  mounted at BASE_PATH so every route automatically
@@ -305,10 +328,10 @@ if (require.main === module) {
     if (err.code === 'EADDRINUSE') {
       console.error(`\n❌ Error: Port ${PORT} is already in use!\n`);
       console.error('Solutions:');
-      console.error('   1. Use a different port: PORT=3001 npm start');
-      console.error('   2. Kill the process using port 3000:');
-      console.error('      lsof -ti:3000 | xargs kill -9');
-      console.error('   3. For cPanel: Restart the app in "Setup Node.js App" panel');
+      console.error(`   1. Use a different free port: PORT=3001 npm start`);
+      console.error(`   2. Kill the process using port ${PORT}:`);
+      console.error(`      lsof -ti:${PORT} | xargs kill -9`);
+      console.error('   3. For cPanel: remove any manual PORT=3000 env var, use cPanel\'s assigned port, then restart the app');
       console.error('\n');
       process.exit(1);
     } else {
