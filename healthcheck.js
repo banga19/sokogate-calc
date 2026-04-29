@@ -3,7 +3,7 @@ const http = require('http');
 const options = {
   hostname: 'localhost',
   port: process.env.PORT || 3000,
-  path: '/Calculate/health',
+  path: (process.env.BASE_PATH || '/sokogate-calc/sokogate-calc-deploy') + '/health',
   method: 'GET',
   timeout: 5000
 };
