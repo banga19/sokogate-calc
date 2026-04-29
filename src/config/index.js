@@ -6,7 +6,7 @@ const config = {
     version: '1.0.0',
     env: process.env.NODE_ENV || 'development',
     port: parseInt(process.env.PORT, 10) || 3000,
-    basePath: process.env.BASE_PATH || '/repositories/Sokogate-calc-deploy',
+    basePath: process.env.BASE_PATH || '/sokogate-calc/sokogate-calc-deploy',
     corsOrigin: process.env.CORS_ORIGIN || 'https://ultimotradingltd.co.ke'
   },
   logging: {

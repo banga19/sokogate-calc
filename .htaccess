@@ -9,12 +9,12 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /repositories/Sokogate-calc-deploy/
+    RewriteBase /sokogate-calc/sokogate-calc-deploy/
 
     # --- 1. Explicitly deny old React build artifacts (410 Gone) ---
-    RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc-deploy/assets/ [NC,OR]
-    RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc-deploy/static/ [NC,OR]
-    RewriteCond %{REQUEST_URI} ^/repositories/sokogate-calc-deploy/index\.html$ [NC]
+    RewriteCond %{REQUEST_URI} ^/sokogate-calc/sokogate-calc-deploy/assets/ [NC,OR]
+    RewriteCond %{REQUEST_URI} ^/sokogate-calc/sokogate-calc-deploy/static/ [NC,OR]
+    RewriteCond %{REQUEST_URI} ^/sokogate-calc/sokogate-calc-deploy/index\.html$ [NC]
     RewriteRule .* - [G,L]
 
     # --- 2. Allow direct access to real files (CSS, JS, images) ---
