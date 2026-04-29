@@ -3,8 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const thicknessGroup = document.getElementById('thicknessGroup');
   const tileSizeGroup = document.getElementById('tileSizeGroup');
   const form = document.getElementById('calcForm');
-  const submitBtn = document.querySelector('.btn');
-  const originalBtnText = submitBtn.textContent;
+  const submitBtn = document.getElementById('calcSubmitBtn');
 
   // Room dimension inputs (main calculator)
   const roomWidthInput = document.getElementById('roomWidth');
@@ -75,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show loading state
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Calculating...';
+    submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Calculating...';
     submitBtn.style.opacity = '0.7';
   });
 
@@ -227,126 +226,3 @@ function showRoomError(message) {
     }, 4000);
   }
 });
-
-// Add CSS animations dynamically
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      max-height: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      max-height: 150px;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-
-  .result-item {
-    animation: fadeInRow 0.3s ease-out forwards;
-    opacity: 0;
-  }
-
-  .result-item:nth-child(1) { animation-delay: 0.1s; }
-  .result-item:nth-child(2) { animation-delay: 0.15s; }
-  .result-item:nth-child(3) { animation-delay: 0.2s; }
-  .result-item:nth-child(4) { animation-delay: 0.25s; }
-  .result-item:nth-child(5) { animation-delay: 0.3s; }
-  .result-item:nth-child(6) { animation-delay: 0.35s; }
-
-  @keyframes fadeInRow {
-    from {
-      opacity: 0;
-      transform: translateX(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  .result-summary {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .material-type-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .field-hint {
-    display: block;
-    margin-top: 6px;
-    color: #64748b;
-    font-size: 12px;
-    font-style: italic;
-  }
-
-  optgroup {
-    font-weight: 600;
-    color: #374151;
-    background: #f3f4f6;
-  }
-
-  optgroup option {
-    font-weight: 400;
-    color: #1f2937;
-    padding-left: 12px;
-  }
-
-  .room-visualizer {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 2px solid #e5e7eb;
-  }
-
-  .room-visualizer h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #374151;
-  }
-
-  .room-visualizer form {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-  }
-
-  .room-visualizer .form-group {
-    margin-bottom: 15px;
-  }
-
-  .room-visualizer .form-group:last-child {
-    margin-bottom: 0;
-  }
-
-  #room-results {
-    margin-bottom: 20px;
-  }
-
-  .room-hint {
-    text-align: center;
-    color: #64748b;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-`;
-document.head.appendChild(styleSheet);
