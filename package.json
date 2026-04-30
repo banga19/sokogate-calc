@@ -1,21 +1,31 @@
 {
   "name": "sokogate-construction-calculator",
-  "version": "1.0.0",
-  "description": "A Node.js app for calculating construction materials - cPanel ready",
-  "main": "app.js",
+  "version": "2.0.0",
+  "description": "A MERN stack app for calculating construction materials - cPanel ready",
+  "main": "src/server.js",
   "keywords": [
     "construction",
     "calculator",
     "nodejs",
     "express",
-    "cpanel",
-    "sokogate"
+    "mongodb",
+    "react",
+    "mern",
+    "cpanel"
   ],
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js",
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "build": "cd client && npm run build",
+    "build:server": "NODE_ENV=production npm run build && NODE_ENV=production node src/server.js",
+    "client": "cd client && npm start",
+    "client:install": "cd client && npm install",
+    "server": "NODE_ENV=development node src/server.js",
+    "dev:concurrently": "concurrently \"NODE_ENV=development node src/server.js\" \"cd client && npm start\"",
     "lint": "eslint .",
-    "test": "node healthcheck.js"
+    "test": "node healthcheck.js",
+    "setup": "npm install && npm run client:install",
+    "setup:full": "npm run setup && npm run build"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
@@ -25,7 +35,13 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
+    "joi": "^17.13.3",
+    "mongoose": "^8.4.5",
     "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0"
   },
   "engines": {
     "node": ">=18.0.0"

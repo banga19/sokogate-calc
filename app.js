@@ -2,266 +2,62 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const { connectDB } = require('./src/config/database');
+const config = require('./src/config');
+const calculatorRoutes = require('./src/routes/calculatorRoutes');
+const apiRoutes = require('./src/routes/apiRoutes');
+const { requestLogger, securityHeaders, createRateLimiter, errorHandler, notFoundHandler } = require('./src/middleware');
+const logger = require('./src/utils/logger');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-/* ═══════════════════════════════════════════════════════════════
-   BASE_PATH  —  MUST MATCH the URL path on the live server.
-   In cPanel, if the app is accessed at:
-       https://ultimotradingltd.co.ke/sokogate-calc/sokogate-calc-deploy
-   then set this in the env panel:
-       BASE_PATH=/sokogate-calc/sokogate-calc-deploy
-   ═══════════════════════════════════════════════════════════════ */
-const BASE_PATH = process.env.BASE_PATH || '/sokogate-calc/sokogate-calc-deploy';
+// Database connection (optional)
+if (process.env.MONGODB_URI || config.mongodb?.uri) {
+  connectDB().catch(err => logger.warn('MongoDB connection failed', { error: err.message }));
+}
 
-const isProduction = process.env.NODE_ENV === 'production';
-
-/* ─── Logging ────────────────────────────────────────────────── */
-app.use((req, res, next) => {
-  if (!isProduction || req.url !== '/health') {
-    console.log(`${new Date().toISOString()} - ${req.method} ${BASE_PATH}${req.url}`);
-  }
-  next();
-});
-
-/* ─── Templating ─────────────────────────────────────────────── */
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-/* ─── CORS ───────────────────────────────────────────────────── */
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
-}));
-
-/* ─── Injects basePath into every template / response ────────── */
-app.use((req, res, next) => {
-  res.locals.basePath = BASE_PATH;
-  next();
-});
-
-/* ─── Body parsing ───────────────────────────────────────────── */
+// Middlewares
+app.use(securityHeaders);
+app.use(createRateLimiter());
+app.use(cors({ origin: config.app.corsOrigin, credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-/* ─── Static assets (served directly via BASE_PATH) ──────────── */
-app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
+// View engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-/* ═══════════════════════════════════════════════════════════════
-   ROUTER  —  mounted at BASE_PATH so every route automatically
-   prefixes correctly (e.g. /health becomes /BASE_PATH/health).
-   ═══════════════════════════════════════════════════════════════ */
-const router = express.Router();
+// Static files
+app.use(config.app.basePath, express.static(path.join(__dirname, 'public')));
+app.use(requestLogger);
 
-/* Health check */
-router.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    basePath: BASE_PATH,
-    env: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+// API Routes
+app.use(config.app.basePath + '/api/v1', apiRoutes);
+
+// Web Routes
+app.use(config.app.basePath, calculatorRoutes);
+
+// Production: Serve React app
+if (process.env.NODE_ENV === 'production') {
+  const reactDistPath = path.join(__dirname, 'client', 'dist');
+  app.use(config.app.basePath, express.static(reactDistPath));
+  app.use(config.app.basePath, (req, res) => {
+    res.sendFile(path.join(reactDistPath, 'index.html'));
   });
-});
+}
 
-/* Calculator page (GET) */
-router.get('/', (req, res) => {
-  res.render('index', { result: null, query: req.query, basePath: BASE_PATH });
-});
+// Root redirect
+app.get('/', (req, res) => res.redirect(config.app.basePath));
 
-/* Calculator page (direct GET /calculate) */
-router.get('/calculate', (req, res) => {
-  res.render('index', { result: null, query: req.query, basePath: BASE_PATH });
-});
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-/* Calculation handler (POST) */
-router.post('/calculate', (req, res) => {
-  const { area, materialType, thickness, tileSize, roomWidth, roomHeight, roomLength } = req.body;
-  let result = {};
-  const areaNum = parseFloat(area);
-
-  if (isNaN(areaNum) || areaNum <= 0) {
-    result = { error: 'Please enter a valid area (greater than 0)' };
-    return res.render('index', { result, query: req.query, basePath: BASE_PATH });
-  }
-
-  const thicknessNum = parseFloat(thickness) || 4;
-  const tileSizeNum = parseFloat(tileSize) || 12;
-
-  const roomWidthNum    = parseFloat(roomWidth)    || 0;
-  const roomHeightNum   = parseFloat(roomHeight)   || 0;
-  const roomLengthNum   = parseFloat(roomLength)   || 0;
-
-  try {
-    switch (materialType) {
-      case 'cement':
-        result.cement  = (areaNum * 0.4).toFixed(2) + ' bags (50kg)';
-        result.sand    = (areaNum * 0.5).toFixed(2) + ' cubic ft';
-        result.materialType = 'Cement & Sand (Plastering)';
-        break;
-      case 'bricks':
-        result.bricks  = (areaNum * 6.25).toFixed(0) + ' bricks';
-        result.cement  = Math.ceil(areaNum * 0.02) + ' bags';
-        result.sand    = (areaNum * 0.15).toFixed(2) + ' cubic ft';
-        result.materialType = 'Bricks (9x4.5 inch)';
-        break;
-      case 'concrete': {
-        const thicknessInFeet = thicknessNum / 12;
-        const concreteVolume  = areaNum * thicknessInFeet;
-        result.concrete  = concreteVolume.toFixed(2) + ' cubic ft (' + (concreteVolume * 0.037).toFixed(2) + ' m³)';
-        result.cement    = Math.ceil(concreteVolume * 6) + ' bags (50kg)';
-        result.sand      = (concreteVolume * 0.5).toFixed(2) + ' cubic ft';
-        result.aggregate = (concreteVolume * 1).toFixed(2) + ' cubic ft';
-        result.materialType = 'Concrete Slab (1:2:4 Mix)';
-        break; }
-      case 'painting':
-        result.paint   = (areaNum * 0.015).toFixed(2) + ' liters (2 coats)';
-        result.primer  = (areaNum * 0.01).toFixed(2) + ' liters';
-        result.materialType = 'Paint (Interior)';
-        break;
-      case 'tiles': {
-        if (!tileSizeNum || tileSizeNum <= 0) {
-          result = { error: 'Please select a tile size' };
-          return res.render('index', { result, query: req.query, basePath: BASE_PATH });
-        }
-        const tileSizeInSqFt = (tileSizeNum * tileSizeNum) / 144;
-        const tilesNeeded    = Math.ceil(areaNum / tileSizeInSqFt * 1.1);
-        const tileArea       = (tilesNeeded * tileSizeNum * tileSizeNum) / 144;
-        result.tiles      = tilesNeeded.toFixed(0) + ' tiles (' + tileSizeNum + '")';
-        result.tileArea   = tileArea.toFixed(2) + ' sq ft (with wastage)';
-        result.adhesive   = (tilesNeeded * 0.02).toFixed(2) + ' liters';
-        result.grout      = (tilesNeeded * 0.1).toFixed(2) + ' kg';
-        result.materialType = 'Floor/Wall Tiles';
-        break; }
-      case 'steel': {
-        if (thicknessNum <= 0) {
-          result = { error: 'Thickness is required for steel calculation' };
-          return res.render('index', { result, query: req.query, basePath: BASE_PATH });
-        }
-        const steelKgPerSqFt = 0.5 * (thicknessNum / 4);
-        result.steel     = (areaNum * steelKgPerSqFt).toFixed(2) + ' kg';
-        result.wireMesh  = (areaNum * 1.2).toFixed(2) + ' sq ft';
-        result.materialType = 'Reinforcement Steel';
-        break; }
-      case 'blocks': {
-        const blockArea   = 0.89;
-        const blocksNeeded = Math.ceil(areaNum / blockArea * 1.05);
-        result.blocks     = blocksNeeded.toFixed(0) + ' concrete blocks (8x8x16")';
-        result.cement     = Math.ceil(blocksNeeded * 0.015) + ' bags';
-        result.sand       = (blocksNeeded * 0.07).toFixed(2) + ' cubic ft';
-        result.materialType = 'Concrete Blocks';
-        break; }
-      case 'gravel': {
-        const gravelThicknessFt = thicknessNum / 12;
-        const gravelVolume      = areaNum * gravelThicknessFt;
-        result.gravel     = gravelVolume.toFixed(2) + ' cubic ft (' + (gravelVolume * 0.037).toFixed(2) + ' m³)';
-        result.geotextile = Math.ceil(areaNum) + ' sq ft';
-        result.materialType = 'Crushed Stone/Gravel';
-        break; }
-      case 'roofing': {
-        const sheetsNeeded = Math.ceil(areaNum / 30 * 1.1);
-        result.roofingSheets = sheetsNeeded.toFixed(0) + ' metal sheets';
-        result.screws        = (sheetsNeeded * 8).toFixed(0) + ' roofing screws';
-        result.flashing      = Math.ceil(areaNum / 50).toFixed(0) + ' linear ft';
-        result.materialType  = 'Metal Roofing';
-        break; }
-      default:
-        result = { error: 'Invalid material type selected' };
-    }
-
-    result.roomWidth  = roomWidthNum;
-    result.roomHeight = roomHeightNum;
-    result.roomLength = roomLengthNum;
-
-    res.render('index', { result, query: req.query, basePath: BASE_PATH });
-  } catch (err) {
-    console.error('Calculation error:', err);
-    res.render('index', { result: { error: 'An error occurred.' }, query: req.query, basePath: BASE_PATH });
-  }
-});
-
-/* Mount router at the computed BASE_PATH */
-app.use(BASE_PATH, router);
-
-/* ═══════════════════════════════════════════════════════════════
-   GLOBAL 404 CATCH-ALL  —  Friendly fallbacks for common issues
-   ═══════════════════════════════════════════════════════════════ */
-app.use('*', (req, res) => {
-  const reqPath = req.originalUrl;
-
-  /* 1. Old stale React paths */
-  if (reqPath.startsWith('/assets/')) {
-    return res.status(410).send('Old React assets removed. Please clear browser cache.');
-  }
-
-  /* 2. Request to root but app lives under BASE_PATH */
-  if (reqPath === '/') {
-    return res.status(302).redirect(BASE_PATH + '/');
-  }
-
-  /* 3. Missing BASE_PATH prefix */
-  if (!reqPath.startsWith(BASE_PATH)) {
-    return res.status(404).type('text/html').send(
-      '<!doctype html>' +
-      '<html><head><title>404 - Path Not Found</title></head>' +
-      '<body style="font-family:sans-serif;max-width:600px;margin:50px auto;padding:0 20px;">' +
-      '<h1>404 - Path Not Found</h1>' +
-      '<p>The URL you requested (<code>' + reqPath + '</code>) does not match this app.</p>' +
-      '<p>This app is served under <code>' + BASE_PATH + '</code>.</p>' +
-      '<p><a href="' + BASE_PATH + '/">Go to calculator</a></p>' +
-      '</body></html>'
-    );
-  }
-
-  /* 4. Truly unknown route under BASE_PATH */
-  res.status(404).render('index', {
-    result: { error: 'Page not found. Check the URL and try again.' },
-    query: req.query,
-    basePath: BASE_PATH
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════
-   ERROR HANDLER  —  catch async rejections & crashes
-   ═══════════════════════════════════════════════════════════════ */
-app.use((err, req, res, next) => {
-  console.error('Server error:', err.stack || err.message || err);
-  res.status(500).render('index', {
-    result: { error: 'Internal server error.' },
-    query: req.query,
-    basePath: BASE_PATH
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════
-   SERVER BOOT
-   ═══════════════════════════════════════════════════════════════ */
+// Server
+const PORT = process.env.PORT || 3000;
 if (require.main === module) {
-  const server = app.listen(PORT, () => {
-    console.log(`Sokogate Calculator running on port ${PORT} | BASE_PATH=${BASE_PATH}`);
-  });
-
-  server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`\n❌ Error: Port ${PORT} is already in use!\n`);
-      console.error('Solutions:');
-      console.error('   1. Use a different port: PORT=3001 npm start');
-      console.error('   2. Kill the process using port 3000:');
-      console.error('      lsof -ti:3000 | xargs kill -9');
-      console.error('   3. For cPanel: Restart the app in "Setup Node.js App" panel');
-      console.error('\n');
-      process.exit(1);
-    } else {
-      console.error('Server error:', err.message);
-      process.exit(1);
-    }
-  });
-
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    server.close(() => {
-      process.exit(0);
-    });
+  app.listen(PORT, () => {
+    logger.info(`Sokogate Calculator running on port ${PORT} | BASE_PATH=${config.app.basePath} | DB=${process.env.MONGODB_URI || config.mongodb?.uri ? 'MongoDB' : 'Disabled'}`);
   });
 }
 

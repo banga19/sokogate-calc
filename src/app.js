@@ -2,16 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const { connectDB } = require('./config/database');
 
 const config = require('./config');
 const calculatorRoutes = require('./routes/calculatorRoutes');
-const {
-  requestLogger,
-  securityHeaders,
-  createRateLimiter,
-  errorHandler,
-  notFoundHandler
-} = require('./middleware');
+const apiRoutes = require('./routes/apiRoutes');
+const { requestLogger, securityHeaders, createRateLimiter, errorHandler, notFoundHandler } = require('./middleware');
 const logger = require('./utils/logger');
 
 class App {
@@ -24,20 +20,23 @@ class App {
     this.initializeErrorHandling();
   }
 
+  async initializeDatabase() {
+    // Only connect to MongoDB if MONGODB_URI is set (optional for cPanel)
+    if (process.env.MONGODB_URI || config.mongodb?.uri) {
+      try {
+        await connectDB();
+      } catch (err) {
+        logger.warn('MongoDB connection failed, continuing without database', { error: err.message });
+      }
+    } else {
+      logger.info('MongoDB URI not configured, running without database');
+    }
+  }
+
   initializeMiddlewares() {
-    // Security headers
     this.app.use(securityHeaders);
-
-    // Rate limiting
     this.app.use(createRateLimiter());
-
-    // CORS
-    this.app.use(cors({
-      origin: this.config.app.corsOrigin,
-      credentials: true
-    }));
-
-    // Body parsing
+    this.app.use(cors({ origin: this.config.app.corsOrigin, credentials: true }));
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(bodyParser.json());
 
@@ -50,53 +49,50 @@ class App {
 
     // Request logging
     this.app.use(requestLogger);
-
-    logger.info('Application middlewares initialized', {
-      env: this.config.app.env,
-      port: this.config.app.port,
-      basePath: this.config.app.basePath
-    });
   }
 
   initializeRoutes() {
-    // Mount routes with base path
+    // API Routes
+    this.app.use(this.config.app.basePath + '/api/v1', apiRoutes);
+
+    // Web Routes
     this.app.use(this.config.app.basePath, calculatorRoutes);
 
-    // Root redirect for convenience
-    this.app.get('/', (req, res) => {
-      res.redirect(this.config.app.basePath);
-    });
+    // In production, serve React app for any unmatched routes under basePath
+    if (process.env.NODE_ENV === 'production') {
+      const reactDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
+      this.app.use(this.config.app.basePath, express.static(reactDistPath));
+      this.app.use(this.config.app.basePath, (req, res) => {
+        res.sendFile(path.join(reactDistPath, 'index.html'));
+      });
+    }
+
+    // Root redirect
+    this.app.get('/', (req, res) => res.redirect(this.config.app.basePath));
   }
 
   initializeErrorHandling() {
-    // 404 handler
     this.app.use(notFoundHandler);
-
-    // Global error handler
     this.app.use(errorHandler);
   }
 
-  getApp() {
-    return this.app;
-  }
-
   async start() {
+    await this.initializeDatabase();
     return new Promise((resolve, reject) => {
       const server = this.app.listen(this.config.app.port, () => {
         logger.info(`${this.config.app.name} v${this.config.app.version} running`, {
           port: this.config.app.port,
           env: this.config.app.env,
-          basePath: this.config.app.basePath
+          basePath: this.config.app.basePath,
+          database: process.env.MONGODB_URI ? 'MongoDB' : 'Disabled'
         });
         resolve(server);
       });
-
-      server.on('error', (err) => {
-        logger.error('Server startup error', { error: err.message });
-        reject(err);
-      });
+      server.on('error', reject);
     });
   }
+
+  getApp() { return this.app; }
 }
 
 module.exports = App;

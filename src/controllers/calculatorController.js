@@ -19,7 +19,7 @@ class CalculatorController {
     });
   });
 
-  // GET /calculate - Redirect or serve page
+  // GET /calculate - Serve calculator page
   getCalculatePage = asyncHandler(async (req, res) => {
     logger.debug('Serving calculate page');
     res.render('index', {
@@ -29,7 +29,7 @@ class CalculatorController {
     });
   });
 
-  // POST /calculate - Process calculation
+  // POST /calculate - Process calculation (Web Interface)
   calculateMaterials = asyncHandler(async (req, res) => {
     // Validate input
     const { error, value } = calculationSchema.validate(req.body, { abortEarly: false });
@@ -47,6 +47,27 @@ class CalculatorController {
     const result = await this.calculatorService.calculateMaterials(value);
 
     logger.info('Calculation completed', { materialType: value.materialType });
+
+    // Save to database
+    try {
+      const Calculation = require('../models/Calculation');
+      const calculationData = {
+        area: value.area,
+        materialType: value.materialType,
+        thickness: value.thickness,
+        tileSize: value.tileSize,
+        roomWidth: value.roomWidth || 0,
+        roomHeight: value.roomHeight || 0,
+        roomLength: value.roomLength || 0,
+        result,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      };
+      await Calculation.create(calculationData);
+      logger.debug('Calculation saved to database');
+    } catch (dbError) {
+      logger.warn('Could not save calculation to database', { error: dbError.message });
+    }
 
     res.render('index', {
       result,
@@ -68,12 +89,6 @@ class CalculatorController {
 
     logger.debug('Health check requested', health);
     res.json(health);
-  });
-
-  // GET /calculate (old redirect) - Redirect to base path
-  redirectCalculate = asyncHandler(async (req, res) => {
-    logger.debug('Redirecting /calculate to base path');
-    res.redirect(config.app.basePath);
   });
 }
 

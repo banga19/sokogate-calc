@@ -11,13 +11,10 @@ router.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Routes - Web Interface (EJS)
 router.get('/', calculatorController.getIndex);
 router.get('/calculate', calculatorController.getCalculatePage);
 router.post('/calculate', calculatorController.calculateMaterials);
 router.get('/health', calculatorController.healthCheck);
-
-// Legacy redirect
-router.get('/calculate', calculatorController.redirectCalculate);
 
 module.exports = router;
