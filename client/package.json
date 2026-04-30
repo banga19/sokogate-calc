@@ -4,15 +4,16 @@
   "private": true,
   "homepage": "/sokogate-calc-deploy",
   "type": "module",
+  "scripts": {
+    "start": "vite",                    // ← ADD THIS
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
