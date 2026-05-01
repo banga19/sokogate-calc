@@ -5,25 +5,9 @@ const path = require('path');
 
 const app = express();
 const DEFAULT_PORT = 3001;
-const DEFAULT_BASE_PATH = '/';
+const BASE_PATH = '/'; // Always root for subdomain
 
-function normalizePort(value) {
-  const port = Number.parseInt(value, 10);
-  return Number.isInteger(port) && port > 0 && port <= 65535 ? port : DEFAULT_PORT;
-}
-
-function normalizeBasePath(value) {
-  const trimmed = String(value || DEFAULT_BASE_PATH).trim();
-  const withLeadingSlash = trimmed.startsWith('/') ? trimmed : '/' + trimmed;
-  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : withLeadingSlash;
-}
-
-const PORT = normalizePort(process.env.APP_PORT || process.env.PORT);
-
-/* ═══════════════════════════════════════════════════════════════
-   BASE_PATH  —  Default: '/' for subdomain root
-   ═══════════════════════════════════════════════════════════════ */
-const BASE_PATH = normalizeBasePath(process.env.BASE_PATH || '/');
+const PORT = process.env.PORT || DEFAULT_PORT;
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -71,8 +55,8 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-/* ─── Static assets (served directly via BASE_PATH) ──────────── */
-app.use(BASE_PATH, express.static(path.join(__dirname, 'public'), { redirect: false }));
+/* ─── Static assets (always served at root) ──────────────── */
+app.use('/', express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 /* ═══════════════════════════════════════════════════════════════
    ROUTER  —  mounted at BASE_PATH so every route automatically

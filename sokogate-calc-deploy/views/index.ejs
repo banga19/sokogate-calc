@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<%= typeof basePath !== 'undefined' && basePath ? basePath : '' %>/style.css?v=1.0.5">
+  <link rel="stylesheet" href="/style.css?v=1.0.5">
   <style>
     /* Fallback inline styles if CSS fails to load */
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f1f5f9; }
@@ -48,12 +48,12 @@
         <form action="<%= typeof basePath !== 'undefined' && basePath ? basePath + '/calculate' : '/calculate' %>" method="POST" id="calcForm">
           <div class="form-group">
             <label class="form-label">Area (sq ft)</label>
-            <input type="number" name="area" class="form-input" required min="1" step="0.01" placeholder="e.g. 500">
+            <input type="number" name="area" id="area" class="form-input" required min="1" step="0.01" placeholder="e.g. 500">
           </div>
 
           <div class="form-group">
             <label class="form-label">Material Type</label>
-            <select name="materialType" class="form-select" required>
+            <select name="materialType" id="materialType" class="form-select" required>
               <option value="" disabled selected>Select material...</option>
               <optgroup label="Masonry">
                 <option value="bricks">Bricks (9" × 4.5")</option>
@@ -72,10 +72,35 @@
               <optgroup label="Site Works">
                 <option value="gravel">Crushed Stone / Gravel</option>
               </optgroup>
-            </select>
-          </div>
+</select>
+           </div>
 
-          <button type="submit" class="btn">Calculate Materials</button>
+           <div class="form-group" id="thicknessGroup" style="display: none;">
+             <label class="form-label">Thickness (inches)</label>
+             <input type="number" name="thickness" class="form-input" min="1" step="0.5" placeholder="e.g. 4" value="4">
+             <span class="field-hint">For concrete slabs (default 4") or steel (default 4mm per sq ft)</span>
+           </div>
+
+           <div class="form-group" id="tileSizeGroup" style="display: none;">
+             <label class="form-label">Tile Size (inches)</label>
+             <select name="tileSize" class="form-select">
+               <option value="12">12" × 12" (1 sq ft)</option>
+               <option value="16">16" × 16" (1.78 sq ft)</option>
+               <option value="18">18" × 18" (2.25 sq ft)</option>
+               <option value="24">24" × 24" (4 sq ft)</option>
+             </select>
+           </div>
+
+           <div class="form-group" id="roomDimensions" style="display: none;">
+             <label class="form-label">Room Dimensions (ft)</label>
+             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+               <input type="number" name="roomWidth" id="roomWidth" class="form-input" placeholder="Width" step="0.1">
+               <input type="number" name="roomLength" id="roomLength" class="form-input" placeholder="Length" step="0.1">
+               <input type="number" name="roomHeight" id="roomHeight" class="form-input" placeholder="Height (optional)" step="0.1">
+             </div>
+           </div>
+
+           <button type="submit" class="btn">Calculate Materials</button>
         </form>
       </div>
 
@@ -101,5 +126,6 @@
       </div>
     </main>
   </div>
+  <script src="/script.js"></script>
 </body>
 </html>

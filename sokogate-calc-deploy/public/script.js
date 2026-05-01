@@ -1,10 +1,14 @@
+// Initialize conditionally - check if elements exist before attaching
 document.addEventListener('DOMContentLoaded', function() {
   const materialTypeSelect = document.getElementById('materialType');
+  
+  if (!materialTypeSelect) return;
+
   const thicknessGroup = document.getElementById('thicknessGroup');
   const tileSizeGroup = document.getElementById('tileSizeGroup');
   const form = document.getElementById('calcForm');
   const submitBtn = document.querySelector('.btn');
-  const originalBtnText = submitBtn.textContent;
+  const originalBtnText = submitBtn ? submitBtn.textContent : 'Calculate Materials';
 
   // Room dimension inputs (main calculator)
   const roomWidthInput = document.getElementById('roomWidth');
@@ -17,16 +21,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedValue = this.value;
 
     // Hide all conditional groups first
-    thicknessGroup.style.display = 'none';
-    tileSizeGroup.style.display = 'none';
+    if (thicknessGroup) thicknessGroup.style.display = 'none';
+    if (tileSizeGroup) tileSizeGroup.style.display = 'none';
+    const roomDimensions = document.getElementById('roomDimensions');
+    if (roomDimensions) roomDimensions.style.display = 'none';
 
     // Show relevant field
     if (selectedValue === 'concrete' || selectedValue === 'steel') {
-      thicknessGroup.style.display = 'block';
-      thicknessGroup.style.animation = 'slideDown 0.3s ease-out';
+      if (thicknessGroup) {
+        thicknessGroup.style.display = 'block';
+        thicknessGroup.style.animation = 'slideDown 0.3s ease-out';
+      }
     } else if (selectedValue === 'tiles') {
-      tileSizeGroup.style.display = 'block';
-      tileSizeGroup.style.animation = 'slideDown 0.3s ease-out';
+      if (tileSizeGroup) {
+        tileSizeGroup.style.display = 'block';
+        tileSizeGroup.style.animation = 'slideDown 0.3s ease-out';
+      }
+    } else if (selectedValue === 'painting') {
+      if (roomDimensions) {
+        roomDimensions.style.display = 'block';
+      }
     }
   });
 
@@ -34,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateAreaFromDimensions() {
     const width = parseFloat(roomWidthInput?.value) || 0;
     const length = parseFloat(roomLengthInput?.value) || 0;
-    if (width > 0 && length > 0) {
+    if (width > 0 && length > 0 && areaInput) {
       areaInput.value = (width * length).toFixed(2);
     }
   }
@@ -46,48 +60,40 @@ document.addEventListener('DOMContentLoaded', function() {
     roomLengthInput.addEventListener('input', updateAreaFromDimensions);
   }
 
-
   // Form submission with validation and loading state
-  form.addEventListener('submit', function(e) {
-    const area = document.getElementById('area').value;
-    const materialType = materialTypeSelect.value;
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const area = document.getElementById('area')?.value;
+      const materialType = materialTypeSelect.value;
 
-    if (!area || area <= 0) {
-      e.preventDefault();
-      showError('Please enter a valid area (greater than 0)');
-      return;
-    }
-
-    if (!materialType) {
-      e.preventDefault();
-      showError('Please select a material type');
-      return;
-    }
-
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Calculating...';
-    submitBtn.style.opacity = '0.7';
-  });
-
-
-
-  // Render results with staggered animation
-  if (typeof resultData === 'object' && resultData !== null && !resultData.error) {
-    setTimeout(() => {
-      if (typeof renderResults === 'function') {
-        renderResults(resultData);
+      if (!area || area <= 0) {
+        e.preventDefault();
+        showError('Please enter a valid area (greater than 0)');
+        return;
       }
-    }, 100);
+
+      if (!materialType) {
+        e.preventDefault();
+        showError('Please select a material type');
+        return;
+      }
+
+      // Show loading state
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Calculating...';
+        submitBtn.style.opacity = '0.7';
+      }
+    });
   }
-
-
 
   // Helper: Show inline error message
   function showError(message) {
     // Remove existing error
     const existingError = document.querySelector('.form-error');
     if (existingError) existingError.remove();
+
+    if (!form) return;
 
     const errorDiv = document.createElement('div');
     errorDiv.className = 'form-error';
@@ -205,3 +211,35 @@ styleSheet.textContent = `
 
 `;
 document.head.appendChild(styleSheet);
+
+// Robust message event handling to prevent spam
+(function() {
+  if (typeof window === 'undefined') return;
+  
+  const messageHandler = function(event) {
+    try {
+      // Only process relevant messages
+      if (!event.data || typeof event.data !== 'object') return;
+      
+      // Debounce: prevent duplicate rapid messages
+      if (messageHandler.lastEvent && 
+          messageHandler.lastEvent.data === event.data &&
+          Date.now() - messageHandler.lastTime < 100) {
+        return;
+      }
+      messageHandler.lastEvent = event;
+      messageHandler.lastTime = Date.now();
+      
+      // Handle expected message types only
+      if (event.data.type === 'CALCULATION_RESULT' || event.data.type === 'FORM_UPDATE') {
+        // Process specific message types
+        console.debug('Handled message:', event.data.type);
+      }
+    } catch (err) {
+      // Silently ignore message handler errors
+    }
+  };
+  
+  // Add listener with proper error handling
+  window.addEventListener('message', messageHandler);
+})();
