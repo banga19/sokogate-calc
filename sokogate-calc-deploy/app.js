@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const DEFAULT_PORT = 3001;
-const DEFAULT_BASE_PATH = '/Calculate';
+const DEFAULT_BASE_PATH = '/';
 
 function normalizePort(value) {
   const port = Number.parseInt(value, 10);
