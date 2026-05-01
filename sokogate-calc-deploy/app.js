@@ -21,13 +21,9 @@ function normalizeBasePath(value) {
 const PORT = normalizePort(process.env.APP_PORT || process.env.PORT);
 
 /* ═══════════════════════════════════════════════════════════════
-   BASE_PATH  —  MUST MATCH the URL path on the live server.
-   In cPanel, if the app is accessed at:
-       https://ultimotradingltd.co.ke/repositories/sokogate-calc3/sokogate-calc-deploy
-   then set this in the env panel:
-       BASE_PATH=/repositories/sokogate-calc3/sokogate-calc-deploy
+   BASE_PATH  —  Default: '/' for subdomain root
    ═══════════════════════════════════════════════════════════════ */
-const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH || '/');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
