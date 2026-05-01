@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const thicknessGroup = document.getElementById('thicknessGroup');
   const tileSizeGroup = document.getElementById('tileSizeGroup');
   const form = document.getElementById('calcForm');
-  const submitBtn = document.getElementById('calcSubmitBtn');
+  const submitBtn = document.querySelector('.btn');
+  const originalBtnText = submitBtn.textContent;
 
   // Room dimension inputs (main calculator)
   const roomWidthInput = document.getElementById('roomWidth');
@@ -36,9 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (width > 0 && length > 0) {
       areaInput.value = (width * length).toFixed(2);
     }
-    if (typeof update3DPreview === 'function') {
-      update3DPreview();
-    }
   }
 
   if (roomWidthInput) {
@@ -47,13 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (roomLengthInput) {
     roomLengthInput.addEventListener('input', updateAreaFromDimensions);
   }
-  if (roomHeightInput) {
-    roomHeightInput.addEventListener('input', function() {
-      if (typeof update3DPreview === 'function') {
-        update3DPreview();
-      }
-    });
-  }
+
 
   // Form submission with validation and loading state
   form.addEventListener('submit', function(e) {
@@ -74,14 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show loading state
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Calculating...';
+    submitBtn.textContent = 'Calculating...';
     submitBtn.style.opacity = '0.7';
   });
 
-  // Initialize 3D preview scene
-  if (typeof init3DScene === 'function') {
-    init3DScene();
-  }
+
 
   // Render results with staggered animation
   if (typeof resultData === 'object' && resultData !== null && !resultData.error) {
@@ -92,103 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
   }
 
-  // ============================
-  // 3D ROOM VISUALIZER FORM
-  // ============================
-  const roomForm = document.getElementById('roomForm');
-  const roomResults = document.getElementById('room-results');
-  const roomBtn = roomForm ? roomForm.querySelector('.btn') : null;
 
-  if (roomForm) {
-    roomForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const formData = new FormData(roomForm);
-      const data = {
-        height: formData.get('height'),
-        width: formData.get('width'),
-        length: formData.get('length'),
-        unit: formData.get('unit')
-      };
-
-      if (roomBtn) {
-        roomBtn.disabled = true;
-        roomBtn.textContent = 'Calculating...';
-      }
-
-      try {
-        const response = await fetch(window.APP_BASE_PATH + '/api/calculate-room', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          displayRoomResults(result);
-          if (typeof updateRoom3D === 'function') {
-            updateRoom3D(result.dimensions, result.unit);
-          }
-        } else {
-          showRoomError(result.error || 'Invalid input. Please check your dimensions.');
-        }
-      } catch (error) {
-        console.error('Room calculation error:', error);
-        showRoomError('Failed to calculate. Please try again.');
-      } finally {
-        roomBtn.disabled = false;
-        roomBtn.textContent = 'Visualize Room';
-      }
-    });
-  }
-
-function displayRoomResults(result) {
-    roomResults.innerHTML = `
-      <section class="results">
-        <h3>Room Materials</h3>
-        <div class="result-item">
-          <span class="label">Floor Area</span>
-          <span class="value">${result.materials.floorArea}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">Total Wall Area</span>
-          <span class="value">${result.materials.totalWallArea}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">Ceiling Area</span>
-          <span class="value">${result.materials.ceilingArea}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">Paint Needed</span>
-          <span class="value">${result.materials.paintNeeded}</span>
-        </div>
-        <div class="result-item">
-          <span class="label">Tile Area</span>
-          <span class="value">${result.materials.tileArea}</span>
-        </div>
-      </section>
-    `;
-    document.getElementById('3d-room-container').style.display = 'block';
-  }
-
-function showRoomError(message) {
-    roomResults.innerHTML = `
-      <div class="error">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="10" cy="10" r="8"/>
-          <line x1="10" y1="6" x2="10" y2="14"/>
-          <line x1="10" y1="14" x2="14" y2="10"/>
-        </svg>
-        <span>${message}</span>
-      </div>
-    `;
-    document.getElementById('3d-room-container').style.display = 'none';
-  }
-
-  // Initialize room 3D scene
-  if (typeof initRoom3D === 'function') {
-    initRoom3D('3d-room-container');
-  }
 
   // Helper: Show inline error message
   function showError(message) {
@@ -226,3 +119,89 @@ function showRoomError(message) {
     }, 4000);
   }
 });
+
+// Add CSS animations dynamically
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      max-height: 150px;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .result-item {
+    animation: fadeInRow 0.3s ease-out forwards;
+    opacity: 0;
+  }
+
+  .result-item:nth-child(1) { animation-delay: 0.1s; }
+  .result-item:nth-child(2) { animation-delay: 0.15s; }
+  .result-item:nth-child(3) { animation-delay: 0.2s; }
+  .result-item:nth-child(4) { animation-delay: 0.25s; }
+  .result-item:nth-child(5) { animation-delay: 0.3s; }
+  .result-item:nth-child(6) { animation-delay: 0.35s; }
+
+  @keyframes fadeInRow {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .result-summary {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .material-type-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .field-hint {
+    display: block;
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  optgroup {
+    font-weight: 600;
+    color: #374151;
+    background: #f3f4f6;
+  }
+
+  optgroup option {
+    font-weight: 400;
+    color: #1f2937;
+    padding-left: 12px;
+  }
+
+
+`;
+document.head.appendChild(styleSheet);

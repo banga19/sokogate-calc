@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<%= basePath %>/style.css?v=1.0.4">
+  <link rel="stylesheet" href="<%= basePath %>/style.css?v=1.0.5">
 </head>
 <body>
   <div class="app-wrapper">
@@ -292,14 +292,14 @@
     </main>
   </div>
 
-  <script>
-    window.APP_BASE_PATH = "<%= basePath %>";
-    window.APP_VERSION   = "1.0.4-prod";
-  </script>
+<script>
+     window.APP_BASE_PATH = "<%= basePath %>";
+     window.APP_VERSION   = "1.0.5-prod";
+   </script>
 
-  <script>
-    const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
-  </script>
-  <script src="<%= basePath %>/script.js?v=1.0.4"></script>
+   <script>
+     const resultData = <%- typeof result !== 'undefined' ? JSON.stringify(result || null) : 'null' %>;
+   </script>
+   <script src="<%= basePath %>/script.js?v=1.0.5"></script>
 </body>
 </html>
