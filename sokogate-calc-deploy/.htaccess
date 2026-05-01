@@ -1,0 +1,13 @@
+# cPanel Node.js Deployment - Passenger handles routing
+# Do NOT add ProxyPass rules when using cPanel Node.js Selector
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<FilesMatch "^\.|^(\.env|package-lock\.json|Dockerfile)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

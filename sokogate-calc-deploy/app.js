@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 const DEFAULT_PORT = 3001;
-const DEFAULT_BASE_PATH = '/repositories/sokogate-calc3/sokogate-calc-deploy';
+const DEFAULT_BASE_PATH = '/Calculate';
 
 function normalizePort(value) {
   const port = Number.parseInt(value, 10);
