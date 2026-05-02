@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sokogate — Construction Materials Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f59e0b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="description" content="Calculate cement, sand, bricks, concrete, tiles, steel, paint, gravel, and roofing materials for your construction project.">
+  <title>Sokogate — Construction Materials Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=1.0.5">
+  <link rel="stylesheet" href="<%= url('style.css') %>?v=1.1.0">
   <style>
     /* Fallback inline styles if CSS fails to load */
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #f1f5f9; }
     .app-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
+    .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
     .hero { text-align: center; padding: 40px 0; }
     .hero h1 { font-size: 2.25rem; color: #0f172a; margin-bottom: 8px; }
     .hero-subtitle { color: #475569; font-size: 1.125rem; margin-bottom: 24px; }
     .form-group { margin-bottom: 20px; }
     .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
-    .form-input, .form-select { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
+    .form-input, .form-select { width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; }
     .form-input:focus, .form-select:focus { border-color: #f59e0b; outline: none; }
-    .btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+    .btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; min-height: 48px; }
     .btn:hover { opacity: 0.95; }
     .main-grid { display: grid; gap: 24px; }
     @media (min-width: 1024px) { .main-grid { grid-template-columns: 1fr 1fr; } }
@@ -29,27 +32,210 @@
     .result-item:last-child { border-bottom: none; }
     .label { color: #475569; font-weight: 500; }
     .value { color: #0f172a; font-weight: 600; font-family: monospace; }
+    /* Mobile spacing fixes */
+    .main-grid { padding: 0 16px 48px; }
+    .hero { margin: 0 16px; }
+    @media (min-width: 640px) { .main-grid { padding: 0 24px 48px; } .hero { margin: 0; } }
   </style>
 </head>
 <body>
   <div class="app-wrapper">
-    <header class="card">
-      <h1 style="margin: 0 0 4px 0; font-size: 24px;">Sokogate Materials Calculator</h1>
+    <header class="card site-header">
+      <div class="container">
+        <a href="<%= url('/') %>" class="brand" aria-label="Sokogate Home">
+          <div class="brand-icon" aria-hidden="true">S</div>
+          <div class="brand-text">
+            <span class="brand-name">Sokogate</span>
+            <span class="brand-tagline">Materials Calculator</span>
+          </div>
+        </a>
+        
+        <div class="header-actions">
+          <!-- Mobile menu placeholder (future expansion) -->
+          <button class="mobile-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="main-menu" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
     </header>
     
-    <section class="hero">
-      <h1>Construction Materials Calculator</h1>
-      <p class="hero-subtitle">Accurately estimate cement, sand, bricks, concrete, tiles, steel, paint, and more for your next build.</p>
-    </section>
+    <main id="main-menu" role="main" tabindex="-1">
+      <section class="hero">
+        <h1>Construction Materials Calculator</h1>
+        <p class="hero-subtitle">Accurately estimate cement, sand, bricks, concrete, tiles, steel, paint, and more for your next build.</p>
+        <div class="hero-badge" aria-live="polite">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          8 Material Types Supported
+        </div>
+      </section>
 
-    <main class="main-grid">
-      <div class="card">
-        <h2 style="margin: 0 0 16px 0; font-size: 20px;">Project Details</h2>
-        <form action="<%= url('calculate') %>" method="POST" id="calcForm">
-          <div class="form-group">
-            <label class="form-label">Area (sq ft)</label>
-            <input type="number" name="area" id="area" class="form-input" required min="1" step="0.01" placeholder="e.g. 500">
-          </div>
+      <main class="main-grid">
+        <div class="card" role="form" aria-label="Material Calculator Form">
+          <h2 style="margin: 0 0 16px 0; font-size: 20px;">Project Details</h2>
+          <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: var(--text-sm);">Enter your measurements to calculate material quantities.</p>
+          
+          <form action="<%= url('calculate') %>" method="POST" id="calcForm" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="area">
+                <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm3 2h6v4H7V6zm8 8v-4h-2v4h2zM7 8v4H5V8h2z" clip-rule="evenodd"/>
+                </svg>
+                Area (sq ft)
+              </label>
+              <input 
+                type="number" 
+                name="area" 
+                id="area" 
+                class="form-input" 
+                required 
+                min="1" 
+                step="0.01" 
+                placeholder="e.g. 500"
+                aria-required="true"
+                aria-describedby="area-hint"
+                autocomplete="off"
+              >
+              <span id="area-hint" class="field-hint">Total surface area to be covered</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="materialType">
+                <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM3 8a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 13a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                </svg>
+                Material Type
+              </label>
+              <select 
+                name="materialType" 
+                id="materialType" 
+                class="form-select" 
+                required
+                aria-required="true"
+                aria-describedby="material-hint"
+              >
+                <option value="" disabled selected>Select material...</option>
+                <optgroup label="Masonry">
+                  <option value="bricks">Bricks (9" × 4.5")</option>
+                  <option value="blocks">Concrete Blocks (8" × 8" × 16")</option>
+                </optgroup>
+                <optgroup label="Concrete & Cement">
+                  <option value="cement">Cement & Sand Plastering</option>
+                  <option value="concrete">Concrete Slab (1:2:4 Mix)</option>
+                  <option value="steel">Reinforcement Steel</option>
+                </optgroup>
+                <optgroup label="Finishing">
+                  <option value="tiles">Floor/Wall Tiles</option>
+                  <option value="painting">Interior Painting</option>
+                  <option value="roofing">Metal Roofing</option>
+                </optgroup>
+                <optgroup label="Site Works">
+                  <option value="gravel">Crushed Stone / Gravel</option>
+                </optgroup>
+              </select>
+              <span id="material-hint" class="field-hint">Choose the material you want to calculate</span>
+            </div>
+
+            <div class="form-group" id="thicknessGroup" style="display: none;" aria-live="polite" aria-atomic="true">
+              <label class="form-label" for="thickness">
+                <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2h-2.586l1.293-1.293a1 1 0 00-1.414-1.414L11 7.586V5a1 1 0 10-2 0v2.586l-1.293-1.293a1 1 0 00-1.414 1.414L7.586 9H5a1 1 0 100 2h2.586l-1.293 1.293z" clip-rule="evenodd"/>
+                </svg>
+                Thickness (inches)
+              </label>
+              <input 
+                type="number" 
+                name="thickness" 
+                id="thickness"
+                class="form-input" 
+                min="1" 
+                step="0.5" 
+                placeholder="e.g. 4" 
+                value="4"
+                aria-describedby="thickness-hint"
+              >
+              <span id="thickness-hint" class="field-hint">For concrete slabs (default 4") or steel (default 4mm per sq ft)</span>
+            </div>
+
+            <div class="form-group" id="tileSizeGroup" style="display: none;" aria-live="polite">
+              <label class="form-label" for="tileSize">
+                <svg class="label-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v2H7V5zm6 6H7v2h6v-2z"/>
+                </svg>
+                Tile Size (inches)
+              </label>
+              <select name="tileSize" id="tileSize" class="form-select" aria-describedby="tile-size-hint">
+                <option value="12">12" × 12" (1 sq ft)</option>
+                <option value="16">16" × 16" (1.78 sq ft)</option>
+                <option value="18">18" × 18" (2.25 sq ft)</option>
+                <option value="24">24" × 24" (4 sq ft)</option>
+              </select>
+              <span id="tile-size-hint" class="field-hint">Select the size of tiles you're using</span>
+            </div>
+
+            <div class="form-group" id="roomDimensions" style="display: none;" aria-live="polite">
+              <fieldset class="form-fieldset">
+                <legend class="form-label" style="border: none; padding: 0; margin-bottom: var(--space-2);">
+                  Room Dimensions (ft)
+                </legend>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <label class="sr-only" for="roomWidth">Width</label>
+                    <input 
+                      type="number" 
+                      name="roomWidth" 
+                      id="roomWidth" 
+                      class="form-input" 
+                      placeholder="Width" 
+                      step="0.1"
+                      aria-label="Room width in feet"
+                    >
+                  </div>
+                  <div>
+                    <label class="sr-only" for="roomLength">Length</label>
+                    <input 
+                      type="number" 
+                      name="roomLength" 
+                      id="roomLength" 
+                      class="form-input" 
+                      placeholder="Length" 
+                      step="0.1"
+                      aria-label="Room length in feet"
+                    >
+                  </div>
+                  <div style="grid-column: span 2;">
+                    <label class="sr-only" for="roomHeight">Height (optional)</label>
+                    <input 
+                      type="number" 
+                      name="roomHeight" 
+                      id="roomHeight" 
+                      class="form-input" 
+                      placeholder="Height (optional)" 
+                      step="0.1"
+                      aria-label="Room height in feet, optional"
+                    >
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-block"
+              aria-live="polite"
+              aria-busy="false"
+              id="submitBtn"
+            >
+              <span class="btn-text">Calculate Materials</span>
+            </button>
+          </form>
+        </div>
 
           <div class="form-group">
             <label class="form-label">Material Type</label>
@@ -104,28 +290,296 @@
         </form>
       </div>
 
-      <div class="card">
+      <div class="card" role="region" aria-label="Calculation Results" aria-live="polite">
         <h2 style="margin: 0 0 16px 0; font-size: 20px;">Calculation Results</h2>
+        
         <% if (typeof result !== 'undefined' && result) { %>
           <% if (result.error) { %>
-            <div style="background: #fee2e2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px; color: #dc2626;">
+            <div 
+              style="background: #fee2e2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px; color: #dc2626;"
+              role="alert"
+              aria-live="assertive"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display: inline; vertical-align: middle; margin-right: 8px;">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
               <%= result.error %>
             </div>
           <% } else { %>
-            <% if (result.cement) { %><div class="result-item"><span class="label">Cement</span><span class="value"><%= result.cement %></span></div><% } %>
-            <% if (result.sand) { %><div class="result-item"><span class="label">Sand</span><span class="value"><%= result.sand %></span></div><% } %>
-            <% if (result.bricks) { %><div class="result-item"><span class="label">Bricks</span><span class="value"><%= result.bricks %></span></div><% } %>
-            <% if (result.concrete) { %><div class="result-item"><span class="label">Concrete</span><span class="value"><%= result.concrete %></span></div><% } %>
-            <% if (result.steel) { %><div class="result-item"><span class="label">Steel</span><span class="value"><%= result.steel %></span></div><% } %>
-            <% if (result.tiles) { %><div class="result-item"><span class="label">Tiles</span><span class="value"><%= result.tiles %></span></div><% } %>
-            <% if (result.paint) { %><div class="result-item"><span class="label">Paint</span><span class="value"><%= result.paint %></span></div><% } %>
+            <div class="results-header">
+              <h3 style="margin: 0; font-size: var(--text-lg); color: var(--text-primary);">Material Estimates</h3>
+              <% if (result.materialType) { %>
+                <span class="results-badge" aria-live="polite"><%= result.materialType %></span>
+              <% } %>
+            </div>
+            
+            <div class="results-grid">
+              <% if (result.cement) { %>
+                <div class="result-card" data-material="cement" tabindex="0">
+                  <div class="result-icon cement" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Cement</div>
+                    <div class="result-value"><%= result.cement %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.sand) { %>
+                <div class="result-card" data-material="sand" tabindex="0">
+                  <div class="result-icon sand" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Sand</div>
+                    <div class="result-value"><%= result.sand %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.bricks) { %>
+                <div class="result-card" data-material="bricks" tabindex="0">
+                  <div class="result-icon bricks" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M3 10h18M3 14h18M3 18h18"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Bricks</div>
+                    <div class="result-value"><%= result.bricks %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.concrete) { %>
+                <div class="result-card" data-material="concrete" tabindex="0">
+                  <div class="result-icon concrete" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Concrete</div>
+                    <div class="result-value"><%= result.concrete %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.steel) { %>
+                <div class="result-card" data-material="steel" tabindex="0">
+                  <div class="result-icon steel" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Steel</div>
+                    <div class="result-value"><%= result.steel %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.tiles) { %>
+                <div class="result-card highlight" data-material="tiles" tabindex="0">
+                  <div class="result-icon tiles" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="7" height="7"/>
+                      <rect x="14" y="3" width="7" height="7"/>
+                      <rect x="14" y="14" width="7" height="7"/>
+                      <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Tiles</div>
+                    <div class="result-value"><%= result.tiles %></div>
+                  </div>
+                </div>
+                <% if (result.tileArea) { %>
+                  <div class="result-card" data-material="tiles-area" tabindex="0">
+                    <div class="result-content">
+                      <div class="result-label">Tile Area (with wastage)</div>
+                      <div class="result-value"><%= result.tileArea %></div>
+                    </div>
+                  </div>
+                <% } %>
+              <% } %>
+              
+              <% if (result.paint) { %>
+                <div class="result-card highlight" data-material="paint" tabindex="0">
+                  <div class="result-icon paint" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Paint</div>
+                    <div class="result-value"><%= result.paint %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <!-- Additional result items for sub-results -->
+              <% if (result.adhesive) { %>
+                <div class="result-card" data-material="adhesive" tabindex="0">
+                  <div class="result-content">
+                    <div class="result-label">Tile Adhesive</div>
+                    <div class="result-value"><%= result.adhesive %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.grout) { %>
+                <div class="result-card" data-material="grout" tabindex="0">
+                  <div class="result-content">
+                    <div class="result-label">Tile Grout</div>
+                    <div class="result-value"><%= result.grout %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+            <!-- Block materials -->
+              <% if (result.blocks) { %>
+                <div class="result-card" data-material="blocks" tabindex="0">
+                  <div class="result-icon blocks" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 3h18v18H3zM3 9h18M9 21V12"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Concrete Blocks</div>
+                    <div class="result-value"><%= result.blocks %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.gravel) { %>
+                <div class="result-card" data-material="gravel" tabindex="0">
+                  <div class="result-icon gravel" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 3h18v18H3zM3 3v18M21 3l-4 4m0-4L17 3"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Gravel</div>
+                    <div class="result-value"><%= result.gravel %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <% if (result.roofingSheets) { %>
+                <div class="result-card highlight" data-material="roofing" tabindex="0">
+                  <div class="result-icon roofing" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 3L2 12h3v8h14v-8h3L12 3z"/>
+                    </svg>
+                  </div>
+                  <div class="result-content">
+                    <div class="result-label">Roofing Sheets</div>
+                    <div class="result-value"><%= result.roofingSheets %></div>
+                  </div>
+                </div>
+                <% if (result.screws) { %>
+                  <div class="result-card" data-material="roofing-screws" tabindex="0">
+                    <div class="result-content">
+                      <div class="result-label">Roofing Screws</div>
+                      <div class="result-value"><%= result.screws %></div>
+                    </div>
+                  </div>
+                <% } %>
+              <% } %>
+              
+              <!-- Aggregate for concrete -->
+              <% if (result.aggregate) { %>
+                <div class="result-card" data-material="aggregate" tabindex="0">
+                  <div class="result-content">
+                    <div class="result-label">Aggregate</div>
+                    <div class="result-value"><%= result.aggregate %></div>
+                  </div>
+                </div>
+              <% } %>
+              
+              <%= 
+                // Safe area summary if room dimensions were provided
+                (result.roomWidth > 0) ? `
+                <div class="result-card" style="grid-column: 1 / -1; background: var(--color-accent-soft); border-color: rgba(245, 158, 11, 0.2);" data-material="room-summary">
+                  <div class="result-content">
+                    <div class="result-label">Room Plan Area (W×L)</div>
+                    <div class="result-value">
+                      ${(result.roomWidth * result.roomLength).toFixed(2)} sq ft 
+                      <span style="font-size: var(--text-sm); color: var(--text-tertiary); margin-left: var(--space-2);">
+                        (${result.roomWidth}' × ${result.roomLength}')
+                      </span>
+                    </div>
+                  </div>
+                  <div class="result-content" style="text-align: right;">
+                    <div class="result-label">Room Height</div>
+                    <div class="result-value">${result.roomHeight > 0 ? result.roomHeight + ' ft' : 'Not specified'}</div>
+                  </div>
+                </div>
+              ` : ''
+              %>
+            
+            </div>
           <% } %>
         <% } else { %>
-          <p style="color: #475569; text-align: center; padding: 40px 0;">Enter project details and click <strong>Calculate Materials</strong> to see estimates.</p>
+          <div class="results-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <p style="color: var(--text-tertiary); text-align: center; padding: 40px 0;">
+              Enter project details and click <strong>Calculate Materials</strong> to see estimates.
+            </p>
+            <p style="font-size: var(--text-sm); color: var(--text-tertiary); margin-top: 8px;">
+              Tip: Use room dimensions to auto-calculate area
+            </p>
+          </div>
         <% } %>
       </div>
     </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        <p>Sokogate Materials Calculator &copy; <%= new Date().getFullYear() %>. Built for construction professionals.</p>
+        <p style="margin-top: 8px; font-size: var(--text-xs); opacity: 0.7;">Accurate estimates for your building projects</p>
+      </div>
+    </footer>
   </div>
-  <script src="/script.js"></script>
+
+  <script src="<%= url('script.js') %>"></script>
+
+  <!-- Custom JS to initialize mobile menu and enhance UX -->
+  <script>
+    // Enhanced accessibility and mobile interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize mobile nav toggle if screen is small
+      const mobileToggle = document.querySelector('.mobile-nav-toggle');
+      if (mobileToggle && window.innerWidth < 768) {
+        mobileToggle.style.display = 'flex';
+      }
+
+      // Close results on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.activeElement.blur();
+        }
+      });
+
+      // Log first interaction for analytics (placeholder)
+      let firstInteraction = false;
+      document.addEventListener('click', function logFirstInteraction() {
+        if (!firstInteraction) {
+          firstInteraction = true;
+          // console.log('First user interaction registered');
+        }
+      }, { once: true });
+    });
+  </script>
 </body>
 </html>
