@@ -45,7 +45,7 @@
     <main class="main-grid">
       <div class="card">
         <h2 style="margin: 0 0 16px 0; font-size: 20px;">Project Details</h2>
-        <form action="<%= typeof basePath !== 'undefined' && basePath ? basePath + '/calculate' : '/calculate' %>" method="POST" id="calcForm">
+        <form action="<%= url('calculate') %>" method="POST" id="calcForm">
           <div class="form-group">
             <label class="form-label">Area (sq ft)</label>
             <input type="number" name="area" id="area" class="form-input" required min="1" step="0.01" placeholder="e.g. 500">

@@ -5,9 +5,28 @@ const path = require('path');
 
 const app = express();
 const DEFAULT_PORT = 3001;
-const BASE_PATH = '/'; // Always root for subdomain
 
-const PORT = process.env.PORT || DEFAULT_PORT;
+const PORT = process.env.PORT || process.env.APP_PORT || DEFAULT_PORT;
+
+// Normalize BASE_PATH from environment (default '/' for subdomain deployments)
+function normalizeBasePath(basePath) {
+  const trimmed = String(basePath || '/').trim();
+  if (!trimmed.startsWith('/')) {
+    return '/' + trimmed;
+  }
+  // Remove trailing slashes (but keep single '/' if that's the whole path)
+  return trimmed.replace(/\/+$/, '') || '/';
+}
+
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH);
+
+// Helper to join basePath with a route path (avoiding double slashes)
+function joinBasePath(base, route) {
+  if (!route) return base;
+  const cleanBase = base === '/' ? '' : base;
+  const cleanRoute = route.startsWith('/') ? route.substring(1) : route;
+  return cleanBase + '/' + cleanRoute;
+}
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -45,9 +64,15 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ─── Injects basePath into every template / response ────────── */
+/* ─── Injects basePath and url helper into every template / response ────────── */
 app.use((req, res, next) => {
   res.locals.basePath = BASE_PATH;
+  res.locals.url = (path) => {
+    if (!path) return BASE_PATH;
+    const cleanBase = BASE_PATH === '/' ? '' : BASE_PATH;
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    return `${cleanBase}/${cleanPath}`;
+  };
   next();
 });
 
@@ -265,7 +290,7 @@ app.use('*', (req, res) => {
   }
 
   /* 2. Request to root but app lives under BASE_PATH */
-  if (reqPath === '/') {
+  if (reqPath === '/' && BASE_PATH !== '/') {
     return res.status(302).redirect(BASE_PATH + '/');
   }
 
